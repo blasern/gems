@@ -33,7 +33,8 @@ setClass("ArtCohort",
            time.to.state =  "data.frame"
            ))
 
-setClass("PosteriorProbabilities", representation(states =  "character", times =  "numeric", probabilities = "matrix"))
+setClass("PosteriorProbabilities", representation(states =  "character", times =  "numeric", probabilities = "matrix", 
+                                                  lower= "matrix", upper = "matrix"))
 
 
 # methods
@@ -65,8 +66,13 @@ setMethod( "possibleTransitions", "transition.structure", function(object){
   rownames(aux4) <-  character()
   aux4
 })
-setMethod("plot", "PosteriorProbabilities", function(x, main = paste("Probability after starting in State", x@states[1], "at time 0"), ...){
-  plotPrevalence(x@times, x@probabilities, x@states, main=main, ...)
+setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste("Probability after starting in State", x@states[1], "at time 0"), ...){
+  if (ci){
+    plotPrevalence(x@times, x@probabilities, x@states, lower=x@lower, upper=x@upper, main=main, ...)
+  }
+  else {
+    plotPrevalence(x@times, x@probabilities, x@states, lower=NA, upper=NA, main=main, ...)
+  }
 })
 
 setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(NA, nrow = newsize - object@size)){ 
@@ -548,7 +554,7 @@ multPar <-
   return(mW)
 }
 plotPrevalence <-
-  function (times, prevalence, stateNames, typ = "separate", main = "State-wise probability over time", ...) 
+  function (times, prevalence, stateNames, lower, upper, typ = "separate", main = "State-wise probability over time", ...) 
 {
   if (typ == "separate") {
     par(mfrow = c(2, ceiling(dim(prevalence)[2]/2)))
@@ -557,6 +563,8 @@ plotPrevalence <-
       plot(times, prevalence[, i], type = "l", col = "blue", 
            lwd = 2, ylim = c(0, 1), ylab = "Probability", 
            xlab = "Time", main = stateNames[[i]])
+      try(lines(times, lower[,i], col="green3", lty=2), silent=TRUE)
+      try(lines(times, upper[,i], col="green3", lty=2), silent=TRUE)
     }
     mtext(main, outer = TRUE, cex = 1.5)
   }
@@ -575,27 +583,52 @@ plotPrevalence <-
 posteriorProbabilities = function(object, times, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
   if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
   else cohorts <- t(object)
+  statesNumber <- dim(cohorts)[1]
   
-  if (ncol(cohorts)==0) prev <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
-  if (ncol(cohorts)==1) {
-    prev <- matrix(0, ncol = nrow(cohorts), nrow = length(times))
-    for (tInd in 1:(nrow(cohorts)-1)) {
-      prev[times < min(c(max(times)+1,cohorts[(tInd+1):nrow(cohorts)]), na.rm=TRUE) & times >= cohorts[tInd] , tInd] <- 1
+  # Prediction interval:
+  dd <- data.frame(t(cohorts))
+  dd$cc <- c(rep(1:100, times=floor(dim(cohorts)[2])/100) , 1:(dim(cohorts)[2]%%100+1))[1:dim(cohorts)[2]]
+  dd <- split(dd,dd$cc)
+  prev <- list()
+  ppp <- NULL
+  for (ciind in 1:100){
+    cohorts <- t(dd[[ciind]][,1:statesNumber])
+    if (ncol(cohorts)==0) {
+      prev[[ciind]] <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
     }
-    prev[times >= cohorts[nrow(cohorts)] , nrow(cohorts)] <- 1
+    if (ncol(cohorts)==1) {
+      prev[[ciind]] <- matrix(0, ncol = nrow(cohorts), nrow = length(times))
+      for (tInd in 1:(nrow(cohorts)-1)) {
+        prev[[ciind]][times < min(c(max(times)+1,cohorts[(tInd+1):nrow(cohorts)]), na.rm=TRUE) & times >= cohorts[tInd] , tInd] <- 1
+      }
+      prev[[ciind]][times >= cohorts[nrow(cohorts)] , nrow(cohorts)] <- 1
+    }
+    if (ncol(cohorts)>=2) {
+      prep1 <- data_prep(cohorts, max(times))
+      prep1 <- prep1[!(prep1$Tstart == prep1$Tstop), ]
+      prepData <- msmDataPrep(prep1)
+      prev[[ciind]] <- prevalence(prepData, times, dim(cohorts)[1])
+    }
+    ppp <- rbind(ppp,prev[[ciind]])
   }
-  if (ncol(cohorts)>=2) {
-    prep1 <- data_prep(cohorts, max(times))
-    prep1 <- prep1[!(prep1$Tstart == prep1$Tstop), ]
-    prepData <- msmDataPrep(prep1)
-    prev <- prevalence(prepData, times, dim(cohorts)[1])
-  }
+  ddd <- data.frame(ppp)
+  ddd$times <- times
+  
+  prev <- as.matrix(ddply(ddd, .(times), function(x) colMeans(x)))[, 1:statesNumber]
+  #prev <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .5)})))[, 1:statesNumber]
+  lower <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .025)})))[, 1:statesNumber]
+  upper <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .975)})))[, 1:statesNumber]
+  
   dimnames(prev) <- list(paste("Time", times), stateNames)
+  dimnames(lower) <- list(paste("Time", times), stateNames)
+  dimnames(upper) <- list(paste("Time", times), stateNames)
   
   pp = new("PosteriorProbabilities")
   pp@states = stateNames
   pp@times = times
   pp@probabilities = prev
+  pp@lower = lower
+  pp@upper = upper
   return(pp)
 }
 
