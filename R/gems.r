@@ -78,7 +78,7 @@ setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste("
   }
 })
 
-setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(NA, nrow = newsize - object@size)){ 
+setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(NA, nrow = newsize - object@size), newInitialStates=rep(1, newsize - object@size)){ 
   aux1 =
     simulateCohort(
       transitionFunction = object@transitionFunctions,
@@ -87,6 +87,7 @@ setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(N
       parameterCovariance = object@parametersCovariances,
       timeToTransition= object@timeToTransition,
       baseline = addbaseline,
+      initialState=newInitialStates,
       to=5
       )
   
@@ -435,10 +436,11 @@ historical <- function(gf,statesNumber, parametric, historyl, startingState, bl,
   formerhistory <- array(0,dim =  c(max(possible), 4))
   eventTimes   <-  matrix(NA, ncol = statesNumber ,nrow= 1)
   T <- to
+  #browser()
   if (historyl ==FALSE){
     time0  = numeric(length(gf))
     time = matrix(0,ncol = statesNumber, nrow =  statesNumber)   #times in the transition matrix
-    for(i in 1:length(gf)){
+    for(i in startingState:length(gf)){
       auxfnh = function(t) return(gf[[i]](t, bl = bl)) #setting baseline
       if (is.element(i,parametric))  time0[i] = samplerP(f = auxfnh, n = 1)
       else time0[i] = sampler(n = 1,f = auxfnh)
@@ -449,7 +451,7 @@ historical <- function(gf,statesNumber, parametric, historyl, startingState, bl,
     wheremin = unlist(apply(time,1,which.min))
     auxpath[,1] = wheremin
     auxpath[,2] = mintimes
-    kk = 1
+    kk = startingState
     path =  rep(NA,statesNumber)
     path[startingState]<-0
     aux =  startingState
@@ -802,6 +804,7 @@ simulateCohort <-
            parameterCovariances=generateParameterCovarianceMatrix(parameterss),
            timeToTransition=array(FALSE, dim = dim(transitionFunctions@list.matrix)),
            baseline=matrix(NA, nrow = cohortSize), 
+           initialState=rep(1, cohortSize),
            to=100){
     
     transitionFunction  =  transitionFunctions@list.matrix
@@ -874,10 +877,11 @@ simulateCohort <-
                             impossible = impossible, 
                             fixpar = fixpar, 
                             direct = direct, 
-                            bl0=baseline,  
+                            bl0=baseline,
+                            startingStates=initialState,
                             to=to)
     cohort[cohort>to] <- NA
-    cohort[1,] <- 0
+    #cohort[1,] <- 0
     
     simulatedcohort <- new("ArtCohort")
     simulatedcohort@baseline <- as.matrix(baseline)
