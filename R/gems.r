@@ -713,7 +713,7 @@ sampler <-
   rate[rate == Inf] <- 0
   rate[is.nan(rate)] <- 0
   rate[is.na(rate)] <- 0
-  rate[rate == 0] <- .Machine$double.eps
+  rate[rate < .Machine$double.eps] <- .Machine$double.eps
   samples = rpexp(n, rate, time)
   if (is.nan(samples)) {
     print(rate)
