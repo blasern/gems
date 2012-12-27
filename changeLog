@@ -1,6 +1,8 @@
 ﻿--------------------------
 ---- ChangeLog - gems ----
 --------------------------
+2012-12-27 Nello Blaser (version 0.83)
+	* Added prediction intervals
 2012-12-19 Nello Blaser (version 0.82)
 	* GIT version control implemented
 2012-10-02 Nello Blaser (version 0.82)

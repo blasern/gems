@@ -69,6 +69,9 @@ setMethod( "possibleTransitions", "transition.structure", function(object){
 setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste("Probability after starting in State", x@states[1], "at time 0"), ...){
   if (ci){
     plotPrevalence(x@times, x@probabilities, x@states, lower=x@lower, upper=x@upper, main=main, ...)
+    if (sum(complete.cases(post@lower))==0) {
+      warning("Too few simulations for prediction intervals")
+    }
   }
   else {
     plotPrevalence(x@times, x@probabilities, x@states, lower=NA, upper=NA, main=main, ...)
@@ -586,38 +589,60 @@ posteriorProbabilities = function(object, times, stateNames = paste("State", as.
   statesNumber <- dim(cohorts)[1]
   
   # Prediction interval:
-  dd <- data.frame(t(cohorts))
-  dd$cc <- c(rep(1:100, times=floor(dim(cohorts)[2])/100) , 1:(dim(cohorts)[2]%%100+1))[1:dim(cohorts)[2]]
-  dd <- split(dd,dd$cc)
-  prev <- list()
-  ppp <- NULL
-  for (ciind in 1:100){
-    cohorts <- t(dd[[ciind]][,1:statesNumber])
+  if (dim(cohorts)[2]>=1000) {
+    dd <- data.frame(t(cohorts))
+    dd$cc <- c(rep(1:100, times=floor(dim(cohorts)[2])/100) , 1:(dim(cohorts)[2]%%100+1))[1:dim(cohorts)[2]]
+    dd <- split(dd,dd$cc)
+    prev <- list()
+    ppp <- NULL
+    for (ciind in 1:100){
+      cohorts <- t(dd[[ciind]][,1:statesNumber])
+      if (ncol(cohorts)==0) {
+        prev[[ciind]] <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
+      }
+      if (ncol(cohorts)==1) {
+        prev[[ciind]] <- matrix(0, ncol = nrow(cohorts), nrow = length(times))
+        for (tInd in 1:(nrow(cohorts)-1)) {
+          prev[[ciind]][times < min(c(max(times)+1,cohorts[(tInd+1):nrow(cohorts)]), na.rm=TRUE) & times >= cohorts[tInd] , tInd] <- 1
+        }
+        prev[[ciind]][times >= cohorts[nrow(cohorts)] , nrow(cohorts)] <- 1
+      }
+      if (ncol(cohorts)>=2) {
+        prep1 <- data_prep(cohorts, max(times))
+        prep1 <- prep1[!(prep1$Tstart == prep1$Tstop), ]
+        prepData <- msmDataPrep(prep1)
+        prev[[ciind]] <- prevalence(prepData, times, dim(cohorts)[1])
+      }
+      ppp <- rbind(ppp,prev[[ciind]])
+    }
+    ddd <- data.frame(ppp)
+    ddd$times <- times
+    
+    prev <- as.matrix(ddply(ddd, .(times), function(x) colMeans(x)))[, 1:statesNumber]
+    #prev <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .5)})))[, 1:statesNumber]
+    lower <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .025)})))[, 1:statesNumber]
+    upper <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .975)})))[, 1:statesNumber]
+  }
+  else {
     if (ncol(cohorts)==0) {
-      prev[[ciind]] <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
+      prev <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
     }
     if (ncol(cohorts)==1) {
-      prev[[ciind]] <- matrix(0, ncol = nrow(cohorts), nrow = length(times))
+      prev <- matrix(0, ncol = nrow(cohorts), nrow = length(times))
       for (tInd in 1:(nrow(cohorts)-1)) {
-        prev[[ciind]][times < min(c(max(times)+1,cohorts[(tInd+1):nrow(cohorts)]), na.rm=TRUE) & times >= cohorts[tInd] , tInd] <- 1
+        prev[times < min(c(max(times)+1,cohorts[(tInd+1):nrow(cohorts)]), na.rm=TRUE) & times >= cohorts[tInd] , tInd] <- 1
       }
-      prev[[ciind]][times >= cohorts[nrow(cohorts)] , nrow(cohorts)] <- 1
+      prev[times >= cohorts[nrow(cohorts)] , nrow(cohorts)] <- 1
     }
     if (ncol(cohorts)>=2) {
       prep1 <- data_prep(cohorts, max(times))
       prep1 <- prep1[!(prep1$Tstart == prep1$Tstop), ]
       prepData <- msmDataPrep(prep1)
-      prev[[ciind]] <- prevalence(prepData, times, dim(cohorts)[1])
+      prev<- prevalence(prepData, times, dim(cohorts)[1])
     }
-    ppp <- rbind(ppp,prev[[ciind]])
+    lower <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
+    upper <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
   }
-  ddd <- data.frame(ppp)
-  ddd$times <- times
-  
-  prev <- as.matrix(ddply(ddd, .(times), function(x) colMeans(x)))[, 1:statesNumber]
-  #prev <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .5)})))[, 1:statesNumber]
-  lower <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .025)})))[, 1:statesNumber]
-  upper <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .975)})))[, 1:statesNumber]
   
   dimnames(prev) <- list(paste("Time", times), stateNames)
   dimnames(lower) <- list(paste("Time", times), stateNames)

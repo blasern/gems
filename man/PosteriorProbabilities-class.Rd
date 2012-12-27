@@ -17,6 +17,8 @@
     \item{\code{states}:}{Object of class \code{"character"}: names of states }
     \item{\code{times}:}{Object of class \code{"numeric"}: time points at which probabilities are evaluated }
     \item{\code{probabilities}:}{Object of class \code{"matrix"}: posterior Probabilities to be in each state at each time }
+    \item{\code{lower}:}{Object of class \code{"matrix"}: lower prediction bound to be in each state at each time }
+    \item{\code{upper}:}{Object of class \code{"matrix"}: upper prediction bound to be in each state at each time }
   }
 }
 \section{Methods}{

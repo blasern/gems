@@ -5,7 +5,7 @@
   posterior probabilities
 }
 \description{
-  Calculates the probabilities after first state
+  Calculates the probabilities and prediction intervals after first state
 }
 \usage{
 posteriorProbabilities(object, times, 
@@ -25,7 +25,7 @@ posteriorProbabilities(object, times,
 }
 
 \value{
-  an object of class \code{"PosteriorProbabilities"}, containing the statenames, timepoints and the posterior probabilities over time.
+  an object of class \code{"PosteriorProbabilities"}, containing the statenames, timepoints and the posterior probabilities with pointwise prediction intervals over time.
 }
 
 \author{
