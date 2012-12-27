@@ -15,6 +15,8 @@ simulateCohort(transitionFunctions,
   parameterCovariances = generateParameterCovarianceMatrix(parameterss), 
   timeToTransition = array(FALSE, dim = dim(transitionFunctions@list.matrix)),
   baseline = matrix(NA,nrow = cohortSize), 
+  initialState=rep(1, cohortSize),
+  absorbing=transitionFunctions@states.number,
   to = 100)
 }
 
@@ -37,6 +39,12 @@ simulateCohort(transitionFunctions,
 }
   \item{baseline}{
   a \code{matrix} or \code{data.frame} of dimension \eqn{cohortSize \times M}{cohortSize x M} with \eqn{M} baseline characteristics of subjects to be simulated.
+}
+  \item{initialState}{
+  a \code{numeric} of length \code{cohortSize} with the initial state for each subject simulated.
+}
+  \item{absorbing}{
+  a \code{numeric} containing all absorbing states. 
 }
   \item{to}{
   final time of the simulation.

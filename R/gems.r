@@ -164,7 +164,7 @@ auxposition <-
 createCohorts <-
 function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0, 
                                                    nrow = length(unlist(mu)), ncol = length(unlist(mu))), historyl = FALSE, 
-          startingStates = rep(1, cohortSize), impossible = NULL, fixpar = NULL, 
+          startingStates = rep(1, cohortSize), absorbing=cohortSize, impossible = NULL, fixpar = NULL, 
           direct = NULL, bl0 = matrix(0, nrow = cohortSize), to = 100) 
 { 
   try(statesNumber <- as.integer(statesNumber))
@@ -299,7 +299,7 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
     individualList[[i]] = t(historical(gf = allFunctions[[i]], 
                     statesNumber = statesNumber, parametric = parametric, 
                     historyl = historyl, startingState = startingStates[i], 
-                    bl = bl0[i, ], to = to))
+                    absorbing=absorbing, bl = bl0[i, ], to = to))
     cohorts[, i] <- individualList[[i]][[1]]
   }
   dimnames(cohorts) <- list(paste("State", 1:statesNumber), 
@@ -431,12 +431,11 @@ generateParameterMatrix <-
   Muclass@list.matrix <- MuMat
   return(Muclass)
 }
-historical <- function(gf,statesNumber, parametric, historyl, startingState, bl, to){
+historical <- function(gf,statesNumber, parametric, historyl, startingState, absorbing, bl, to){
   possible <- auxcounter(statesNumber)
   formerhistory <- array(0,dim =  c(max(possible), 4))
   eventTimes   <-  matrix(NA, ncol = statesNumber ,nrow= 1)
   T <- to
-  #browser()
   if (historyl ==FALSE){
     time0  = numeric(length(gf))
     time = matrix(0,ncol = statesNumber, nrow =  statesNumber)   #times in the transition matrix
@@ -455,7 +454,7 @@ historical <- function(gf,statesNumber, parametric, historyl, startingState, bl,
     path =  rep(NA,statesNumber)
     path[startingState]<-0
     aux =  startingState
-    while(aux < statesNumber && max(path, na.rm=TRUE)<=T){
+    while(aux %in% setdiff(startingState:statesNumber, absorbing) && max(path, na.rm=TRUE)<=T){
       aux = wheremin[aux]
       path[aux] = mintimes[kk] + sum(path, na.rm=TRUE)
       kk =  aux
@@ -465,11 +464,12 @@ historical <- function(gf,statesNumber, parametric, historyl, startingState, bl,
  
   else { #History =  TRUE
     aux = possible[startingState,]; aux = aux[aux !=0];
+    par = match(intersect(aux,parametric),aux)
     f =  gf[aux]; rm(aux)
     time = numeric(length(f))
     for(i in 1:length(f)){
       auxfhnl = function(t) return(f[[i]](t, history = numeric(200), bl = bl))
-      if (is.element(i,parametric))  {time[i] = samplerP(f = auxfhnl, n = 1)}
+      if (is.element(i,par))  {time[i] = samplerP(f = auxfhnl, n = 1)}
       else {
         time[i] = sampler(n = 1,f = auxfhnl, to=to)
       }
@@ -478,15 +478,16 @@ historical <- function(gf,statesNumber, parametric, historyl, startingState, bl,
     mt = min(time)
     wmin = which(time == mt)
    
-    formerhistory[wmin,1] = possible[startingState, wmin+1] # diag 0/ upper
-    formerhistory[wmin,2] = mt
-    formerhistory[wmin,3] = mt
+    formerhistory[startingState+wmin-1,1] = possible[startingState, startingState+wmin] # diag 0/ upper
+    formerhistory[startingState+wmin-1,2] = mt
+    formerhistory[startingState+wmin-1,3] = mt
    
     k = auxposition(possible, max(formerhistory[,1]))[2]  #current state of the patient
     #            outputCohort[,1:3] = formerhistory[,1:3]
-    formerhistory[wmin,4]   = k
+    formerhistory[startingState+wmin-1,4]   = k
     lim =   mt
-    while(k < (statesNumber) && lim <= T ){ ### rembember  to change: patients are now dying in two diff states
+    #while(k < (statesNumber) && lim <= T ){ ### rembember  to change: patients are now dying in two diff states
+    while(k %in% setdiff(startingState:statesNumber, absorbing) && lim <= T){
       aux =       possible[auxposition(possible, max(na.rm = TRUE,formerhistory[,1]))[2],]; aux =  aux[aux !=0]
       f =  gf[aux]
      
@@ -805,6 +806,7 @@ simulateCohort <-
            timeToTransition=array(FALSE, dim = dim(transitionFunctions@list.matrix)),
            baseline=matrix(NA, nrow = cohortSize), 
            initialState=rep(1, cohortSize),
+           absorbing=transitionFunctions@states.number,
            to=100){
     
     transitionFunction  =  transitionFunctions@list.matrix
@@ -879,6 +881,7 @@ simulateCohort <-
                             direct = direct, 
                             bl0=baseline,
                             startingStates=initialState,
+                            absorbing=absorbing,
                             to=to)
     cohort[cohort>to] <- NA
     #cohort[1,] <- 0
