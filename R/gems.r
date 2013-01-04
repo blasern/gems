@@ -66,15 +66,17 @@ setMethod( "possibleTransitions", "transition.structure", function(object){
   rownames(aux4) <-  character()
   aux4
 })
-setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste("Probability after starting in State", x@states[1], "at time 0"), ...){
+setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste("Probability after starting in State", x@states[1], "at time 0"), states=1:dim(x@probabilities)[2], ...){
   if (ci){
-    plotPrevalence(x@times, x@probabilities, x@states, lower=x@lower, upper=x@upper, main=main, ...)
+    plotPrevalence(x@times, x@probabilities, x@states, lower=x@lower, upper=x@upper, main=main, states=states, ...)
     if (sum(complete.cases(post@lower))==0) {
       warning("Too few simulations for prediction intervals")
     }
+    par(mfrow=c(1,1))
   }
   else {
-    plotPrevalence(x@times, x@probabilities, x@states, lower=NA, upper=NA, main=main, ...)
+    plotPrevalence(x@times, x@probabilities, x@states, lower=NA, upper=NA, main=main, states=states, ...)
+    par(mfrow=c(1,1))
   }
 })
 
@@ -560,12 +562,13 @@ multPar <-
   return(mW)
 }
 plotPrevalence <-
-  function (times, prevalence, stateNames, lower, upper, typ = "separate", main = "State-wise probability over time", ...) 
+  function (times, prevalence, stateNames, lower, upper, typ = "separate", main = "State-wise probability over time", states, ...) 
 {
   if (typ == "separate") {
-    par(mfrow = c(2, ceiling(dim(prevalence)[2]/2)))
+    par(mfrow = c(2, ceiling(length(states)/2)))
+    if (length(states)==1) par(mfrow = c(1,1))
     par(oma = c(0, 0, 2, 0))
-    for (i in 1:dim(prevalence)[2]) {
+    for (i in states) {
       plot(times, prevalence[, i], type = "l", col = "blue", 
            lwd = 2, ylim = c(0, 1), ylab = "Probability", 
            xlab = "Time", main = stateNames[[i]])
