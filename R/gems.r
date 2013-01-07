@@ -66,16 +66,19 @@ setMethod( "possibleTransitions", "transition.structure", function(object){
   rownames(aux4) <-  character()
   aux4
 })
-setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste("Probability after starting in State", x@states[1], "at time 0"), states=1:dim(x@probabilities)[2], ...){
+setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste("Probability after starting in State", x@states[1], "at time 0"), states=1:dim(x@probabilities)[2], 
+                                                     lwd=c(2,2), col=c('blue','green3'), lty=c(1,2), xlab="Time", ylab="Probability", ...){
   if (ci){
-    plotPrevalence(x@times, x@probabilities, x@states, lower=x@lower, upper=x@upper, main=main, states=states, ...)
+    plotPrevalence(x@times, x@probabilities, x@states, lower=x@lower, upper=x@upper, main=main, states=states, 
+                   lwd=lwd, col=col, lty=lty, xlab=xlab, ylab=ylab, ...)
     if (sum(complete.cases(post@lower))==0) {
       warning("Too few simulations for prediction intervals")
     }
     par(mfrow=c(1,1))
   }
   else {
-    plotPrevalence(x@times, x@probabilities, x@states, lower=NA, upper=NA, main=main, states=states, ...)
+    plotPrevalence(x@times, x@probabilities, x@states, lower=NA, upper=NA, main=main, states=states, 
+                   lwd=lwd, col=col, lty=lty, xlab=xlab, ylab=ylab, ...)
     par(mfrow=c(1,1))
   }
 })
@@ -562,18 +565,22 @@ multPar <-
   return(mW)
 }
 plotPrevalence <-
-  function (times, prevalence, stateNames, lower, upper, typ = "separate", main = "State-wise probability over time", states, ...) 
+  function (times, prevalence, stateNames, lower, upper, typ = "separate", main = "State-wise probability over time", states, 
+            lwd=c(2,2), col=c('blue','green3'), lty=c(1,2), xlab="Time", ylab="Probability" , ...) 
 {
   if (typ == "separate") {
+    if (length(col)==1) col <- rep(col, 2)
+    if (length(lty)==1) lty <- rep(col, 2)
+    if (length(lwd)==1) lwd <- rep(lwd, 2)
     par(mfrow = c(2, ceiling(length(states)/2)))
     if (length(states)==1) par(mfrow = c(1,1))
     par(oma = c(0, 0, 2, 0))
     for (i in states) {
-      plot(times, prevalence[, i], type = "l", col = "blue", 
-           lwd = 2, ylim = c(0, 1), ylab = "Probability", 
-           xlab = "Time", main = stateNames[[i]])
-      try(lines(times, lower[,i], col="green3", lty=2), silent=TRUE)
-      try(lines(times, upper[,i], col="green3", lty=2), silent=TRUE)
+      plot(times, prevalence[, i], type = "l", col = col[1],
+           lwd = lwd, ylim = c(0, 1), ylab = ylab,
+           xlab = xlab, main = stateNames[[i]], ...)
+      try(lines(times, lower[,i], col=col[2], lty=lty[2]), silent=TRUE)
+      try(lines(times, upper[,i], col=col[2], lty=lty[2]), silent=TRUE)
     }
     mtext(main, outer = TRUE, cex = 1.5)
   }
