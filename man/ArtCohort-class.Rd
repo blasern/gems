@@ -5,6 +5,8 @@
 \alias{[,ArtCohort-method}
 \alias{summary,ArtCohort-method}
 \alias{update,ArtCohort-method}
+\alias{head,ArtCohort-method}
+\alias{tail,ArtCohort-method}
 
 \title{Class \code{"ArtCohort"}}
 \description{
@@ -33,6 +35,8 @@
     \item{[}{\code{signature(x = "ArtCohort")}: extract subsets of slot \code{time.to.state} in artificial cohorts }
     \item{summary}{\code{signature(object = "ArtCohort")}: summarize the artificial cohort }
     \item{update}{\code{signature(object = "ArtCohort")}: update an artificial cohort }
+    \item{head}{\code{signature(x = "ArtCohort")}: returns the first part of the artificial cohort }
+    \item{tail}{\code{signature(x = "ArtCohort")}: returns the last part of the artificial cohort }
 	 }
 }
 \author{

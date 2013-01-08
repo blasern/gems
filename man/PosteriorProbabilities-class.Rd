@@ -4,6 +4,8 @@
 \alias{PosteriorProbabilities-class}
 \alias{[,PosteriorProbabilities-method}
 \alias{plot,PosteriorProbabilities-method}
+\alias{head,PosteriorProbabilities-method}
+\alias{tail,PosteriorProbabilities-method}
 
 \title{Class \code{"PosteriorProbabilities"}}
 \description{
@@ -25,6 +27,8 @@
   \describe{
     \item{[}{\code{signature(x = "PosteriorProbabilities")}: accesses the probabilities slot }
     \item{plot}{\code{signature(x = "PosteriorProbabilities")}: plots the posterior probabilities }
+    \item{head}{\code{signature(x = "PosteriorProbabilities")}: returns the first part of the transition probabilities }
+    \item{tail}{\code{signature(x  = "PosteriorProbabilities")}: returns the last part of the transition probabilities }
 	 }
 }
 
