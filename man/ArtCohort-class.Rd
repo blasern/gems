@@ -19,7 +19,7 @@
     \item{\code{size}:}{Object of class \code{"numeric"}: cohort size }
     \item{\code{baseline}:}{Object of class \code{"matrix"}: baseline matrix }
     \item{\code{follow.up}:}{Object of class \code{"numeric"}: maximum follow-up time}
-    \item{\code{parameterss}:}{Object of class
+    \item{\code{parameters}:}{Object of class
       \code{"transition.structure"}: input parameters }
     \item{\code{parametersCovariances}:}{Object of class \code{"transition.structure"}: input covariance matrices }
     \item{\code{timeToTransition}:}{Object of class \code{"matrix"}:

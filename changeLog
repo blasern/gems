@@ -2,6 +2,9 @@
 ---- ChangeLog - gems ----
 --------------------------
 2013-01-07 Luisa Salazar 
+	* Changed names of formals and representations
+	* Adjusted man to be consistent with new names
+2013-01-07 Luisa Salazar 
 	* Added GIT
 2012-12-27 Nello Blaser (version 0.83)
 	* Added prediction intervals

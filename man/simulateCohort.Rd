@@ -10,9 +10,9 @@
 }
 \usage{
 simulateCohort(transitionFunctions, 
-  parameterss, 
+  parameters, 
   cohortSize = 1000, 
-  parameterCovariances = generateParameterCovarianceMatrix(parameterss), 
+  parameterCovariances = generateParameterCovarianceMatrix(parameters), 
   timeToTransition = array(FALSE, dim = dim(transitionFunctions@list.matrix)),
   baseline = matrix(NA,nrow = cohortSize), 
   initialState=rep(1, cohortSize),
@@ -25,7 +25,7 @@ simulateCohort(transitionFunctions,
   a \code{transition.structure} of dimension \eqn{N \times N}{N x N}, where \eqn{N} is the number of states. The \code{transition.structure} contains hazard functions or time to event function associated to each possible transition. The elements of this \code{list} can be either expressed as an explicit R \code{function} or as a \code{character} ("impossible", "Weibull", "multWeibull", "exponential") in order to express impossible transitions or parametric forms for the distributions of time to event. If the functions should depend on time, baseline characteristics or be \emph{history-dependent}, the function arguments \emph{t}, \emph{bl} or \emph{history} can be used. Time \emph{t} refers to the time since entry into the current state. For the time since the initial state, use \code{t+sum(history)}.  
   %history: vector, each element corresponds to a transition number, 0 if transition does not occur}
 }
-  \item{parameterss}{
+  \item{parameters}{
   a \code{transition.structure} of dimension \eqn{N \times N}{N x N}, whose components \code{list} the mean values for the parameters in the \code{transitionFunction}. If the corresponding \code{transitionFunction} is a \code{function}, the parameters should appear in the same order as in the \code{function}, leaving out \emph{t}, \emph{bl} and \emph{history}. If the corresponding \code{transitionFunction} is the \code{character} "Weibull", the first argument is the shape and the second one the scale. If the corresponding \code{transitionFunction} is the \code{character} "multWeibull", specify weights, shapes, scales in this order. 
 }
   \item{cohortSize}{
