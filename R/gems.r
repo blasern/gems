@@ -105,6 +105,22 @@ setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(N
   newcohort
 })
 
+setMethod("head", "ArtCohort", function(x){
+  head(x@time.to.state)
+})
+
+setMethod("tail", "ArtCohort", function(x){
+  tail(x@time.to.state)
+})
+
+setMethod("head", "PosteriorProbabilities", function(x){
+  head(x@probabilities)
+})
+
+setMethod("tail", "PosteriorProbabilities", function(x){
+  tail(x@probabilities)
+})
+
 setMethod( "summary", "ArtCohort", function(object){
   summ <- matrix(list(
     (object@states.number),
