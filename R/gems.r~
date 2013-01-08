@@ -26,10 +26,10 @@ setClass("ArtCohort",
            size =  "numeric",
            baseline = "matrix",
            follow.up = "numeric",
-           parameters= "transition.structure",
+           parameterss= "transition.structure",
            parametersCovariances = "transition.structure",
            timeToTransition = "matrix",
-           transitionFunctions = "transition.structure",
+           transitionFunctions =  "transition.structure",
            time.to.state =  "data.frame"
            ))
 
@@ -87,7 +87,7 @@ setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(N
   aux1 =
     simulateCohort(
       transitionFunction = object@transitionFunctions,
-      parameters = object@parameters,
+      parameterss = object@parameterss,
       cohortSize = newsize - object@size ,
       parameterCovariance = object@parametersCovariances,
       timeToTransition= object@timeToTransition,
@@ -111,7 +111,7 @@ setMethod( "summary", "ArtCohort", function(object){
     (object@size),
     (object@baseline),
     (object@follow.up),
-    (object@parameters),
+    (object@parameterss),
     (object@parametersCovariances),
     (object@timeToTransition),
     (object@transitionFunctions),
@@ -181,7 +181,7 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
     hazardf <- t(hazardf)[t(auxcounter(statesNumber)) > 0]
   }
   if (length(hazardf) > (statesNumber * (statesNumber - 1)/2))
-      stop("hazardf is not consistent with the number of states")
+    stop("hazardf is not consistent with the number of states")
   if (length(hazardf) < (statesNumber * (statesNumber - 1)/2)) {
     length(hazardf) <- statesNumber * (statesNumber - 1)/2
   }
@@ -189,7 +189,7 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
     if (length(hazardf[[tr]]) > 0) {
       if (class(hazardf[[tr]]) != "function") {
         if (hazardf[[tr]] != "Weibull" && hazardf[[tr]] !=
-            "multWeibull" &&  hazardf[[tr]] != "Exponential" && hazardf[[tr]] != "impossible" &&
+            "multWeibull" && hazardf[[tr]] != "impossible" &&
             !is.na(hazardf[[tr]]))
           try(hazardf[[tr]] <- as.function(hazardf[[tr]]))
       }
@@ -265,7 +265,7 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
       k = k + 1
       parametric[k] = i
       if (hazardf[[i]] == "Weibull" || hazardf[[i]] ==
-          "multWeibull" || hazardf[[i]] == "Exponential") {
+          "multWeibull") {
         if (hazardf[[i]] == "Weibull") {
           if (!historyl)
             hazardf[[i]] = function(t, shape, scale,
@@ -281,14 +281,9 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
             else hazardf[[i]] = function(t, w, shapes,
                           scales, history, bl) multPar(t, w, shapes,
                                                        scales)
-        }
-          else if (hazardf[[i]] == "Exponential"){
-              if (!historyl)
-                  hazardf[[i]] = function(t, rate, bl) rexp(t, rate)
-              else hazardf[[i]] = function(t, rate, history, bl) rexp(t, rate)
           }
+        }
       }
-    }
       else {
         print("In this transition it reads a function that doesn't recognize")
         print(i)
@@ -422,11 +417,6 @@ generateParameterMatrix <-
       if (hf[[trans]] == "multWeibull") {
         lengthMu[trans] <- 3
       }
-
-      if (hf[[trans]] == "Exponential") {
-          lengthMu[trans] <- 1
-      }
-
     }
     else if (class(hf[[trans]]) == "function") {
       if (length(formals(hf[[trans]])) > 0) {
@@ -820,9 +810,9 @@ simFunctions <-
 }
 simulateCohort <-
   function(transitionFunctions,
-           parameters,
+           parameterss,
            cohortSize=1000,
-           parameterCovariances=generateParameterCovarianceMatrix(parameters),
+           parameterCovariances=generateParameterCovarianceMatrix(parameterss),
            timeToTransition=array(FALSE, dim = dim(transitionFunctions@list.matrix)),
            baseline=matrix(NA, nrow = cohortSize),
            initialState=rep(1, cohortSize),
@@ -831,7 +821,7 @@ simulateCohort <-
 
     transitionFunction  =  transitionFunctions@list.matrix
     parameterCovariance =  parameterCovariances@list.matrix
-    parameters.in =  parameters@list.matrix
+    parameters =  parameterss@list.matrix
 
     statesNumber <- dim(transitionFunction)[1]
     historyDep <- length(grep(c("history"), transitionFunction))>0
@@ -874,7 +864,7 @@ simulateCohort <-
       }
     }
 
-    sigma <- matrix(0, ncol=length(unlist(parameters.in)), nrow=length(unlist(parameters.in)))
+    sigma <- matrix(0, ncol=length(unlist(parameters)), nrow=length(unlist(parameters)))
 
     start <- 0
     for (matIndex in 1:dim(parameterCovariance)[1]) {
@@ -893,7 +883,7 @@ simulateCohort <-
     cohort <- createCohorts(hazardf=hf,
                             statesNumber=statesNumber,
                             cohortSize=cohortSize,
-                            mu=parameters.in,
+                            mu=parameters,
                             sigma = sigma,
                             historyl = historyDep,
                             impossible = impossible,
@@ -909,7 +899,7 @@ simulateCohort <-
     simulatedcohort <- new("ArtCohort")
     simulatedcohort@baseline <- as.matrix(baseline)
     simulatedcohort@follow.up <- to
-    simulatedcohort@parameters <- parameters
+    simulatedcohort@parameterss <- parameterss
     simulatedcohort@parametersCovariances <- parameterCovariances
     simulatedcohort@timeToTransition <- timeToTransition
     simulatedcohort@transitionFunctions <- transitionFunctions
