@@ -4,6 +4,7 @@
 \alias{transition.structure-class}
 \alias{[[,transition.structure-method}
 \alias{[[<-,transition.structure-method}
+\alias{print,transition.structure-method}
 
 \title{Class \code{"transition.structure"}}
 \description{
@@ -23,6 +24,7 @@ Objects are created by calls to the functions \code{generateHazardMatrix}, \code
   \describe{
     \item{[[}{\code{signature(x = "transition.structure")}: extract subsets of slot \code{list.matrix} of \code{transition.structure} }
     \item{[[<-}{\code{signature(x = "transition.structure")}: replace subsets of slot \code{list.matrix} of \code{transition.structure} }
+    \item{print}{\code{signature(x = "transition.structure")}}: prints the slot \code{list.matrix} of the \code{transition.structure}
    }
 }
 \author{

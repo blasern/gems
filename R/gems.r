@@ -105,20 +105,34 @@ setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(N
   newcohort
 })
 
-setMethod("head", "ArtCohort", function(x){
-  head(x@time.to.state)
+setMethod("head", "ArtCohort", function(x, ...){
+  head(x@time.to.state, ...)
 })
 
-setMethod("tail", "ArtCohort", function(x){
-  tail(x@time.to.state)
+setMethod("tail", "ArtCohort", function(x, ...){
+  tail(x@time.to.state, ...)
 })
 
-setMethod("head", "PosteriorProbabilities", function(x){
-  head(x@probabilities)
+setMethod("head", "PosteriorProbabilities", function(x, ...){
+  head(x@probabilities, ...)
 })
 
-setMethod("tail", "PosteriorProbabilities", function(x){
-  tail(x@probabilities)
+setMethod("tail", "PosteriorProbabilities", function(x, ...){
+  tail(x@probabilities, ...)
+})
+
+setMethod("print", "transition.structure", function(x){
+  mat <- x@list.matrix
+  mchar <- lapply(mat, function(x) {
+    y <- x
+    if (is.function(x)) {
+      y <- paste("function(", paste(names(formals(x)), collapse=", "), ")", sep="")
+      }
+    return(y)
+    })
+  dim(mchar) <- dim(mat)
+  dimnames(mchar) <- dimnames(mat)
+  print(mchar)
 })
 
 setMethod( "summary", "ArtCohort", function(object){
@@ -341,6 +355,7 @@ data_prep <-
   status <- array(TRUE, dim = dim(times))
   status[is.na(times)] <- FALSE
   times[times>=maxtime]<-maxtime
+  status[times >= maxtime] <- FALSE
   times[status == FALSE] <- maxtime + 1
   transList <- list()
   for (i in 1:(states_number - 1)) {
@@ -719,7 +734,7 @@ prepareF <-
       l = list(lsim + 2)
       l[[1]] = t
       l[2:(length(sim) + 1)] = sim[1:length(sim)]
-      l[length(sim) + 2] = bl
+      l[[length(sim) + 2]] = bl
       return(do.call(func, l))
     }
     return(ofnl)
