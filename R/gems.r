@@ -1123,9 +1123,11 @@ msprep <- function (time, status, data, trans, start, id, keep)
 
 msprepEngine <- function (time, status, id, starttime, startstate, trans, originalStates, longmat)
 {
-  if (is.null(nrow(time)))
-    return(longmat)
-  if (nrow(time) == 0)
+  #if (is.null(nrow(time)))
+  #  return(longmat)
+  #if (nrow(time) == 0)
+  #  return(longmat)
+  if (length(time) == 0)
     return(longmat)
   states.to <- apply(!is.na(trans), 1, sum)
   absorbing <- which(states.to == 0)
@@ -1142,14 +1144,27 @@ msprepEngine <- function (time, status, id, starttime, startstate, trans, origin
     nreach <- length(tostates)
     if ((nstart > 0) & (nreach > 0)) {
       Tstart <- starttime[subjs]
-      Tstop <- time[subjs, tostates, drop = FALSE]
-      Tstop[Tstop < Tstart] <- Inf
-      stat <- status[subjs, tostates, drop = FALSE]
-      smallesttime <- apply(Tstop, 1, min)
-      hlp <- Tstop * 1/stat
-      hlp[Tstop == 0 & stat == 0] <- Inf
-      nexttime <- apply(hlp, 1, min)
-      censored <- which(is.infinite(apply(hlp, 1, min)))
+      ###
+      if (!is.null(dim(time))) {
+        Tstop <- time[subjs, tostates, drop = FALSE]
+        Tstop[Tstop < Tstart] <- Inf
+        stat <- status[subjs, tostates, drop = FALSE]
+        smallesttime <- apply(Tstop, 1, min)
+        hlp <- Tstop * 1/stat
+        hlp[Tstop == 0 & stat == 0] <- Inf
+        nexttime <- apply(hlp, 1, min)
+        censored <- which(is.infinite(apply(hlp, 1, min)))
+      }
+      else {
+        Tstop <- time[tostates, drop = FALSE]
+        Tstop[Tstop < Tstart] <- Inf
+        stat <- status[tostates, drop = FALSE]
+        smallesttime <- min(Tstop)
+        hlp <- Tstop * 1/stat
+        hlp[Tstop == 0 & stat == 0] <- Inf
+        nexttime <- min(hlp)
+        censored <- which(is.infinite(min(hlp)))
+      }
       wh <- which(smallesttime < nexttime)
       whminc <- setdiff(wh, censored)
       if (length(whminc) > 0) {
@@ -1159,6 +1174,7 @@ msprepEngine <- function (time, status, id, starttime, startstate, trans, origin
                 ", subject ", whsubjs, " has smallest transition time with status=0, larger transition time with status=1")
       }
       nexttime[censored] <- smallesttime[censored]
+      if (!is.null(dim(time))){
       if (ncol(hlp) > 1) {
         hlpsrt <- t(apply(hlp, 1, sort))
         warn1 <- which(hlpsrt[, 1] - hlpsrt[, 2] == 0)
@@ -1172,14 +1188,16 @@ msprepEngine <- function (time, status, id, starttime, startstate, trans, origin
                   isw, " at times ", hsw, "; smallest receiving state chosen")
         }
       }
+      }
       if (length(censored) > 0) {
-        nextstate <- apply(hlp[-censored, , drop = FALSE],
-                           1, which.min)
+        if (!is.null(dim(hlp))) nextstate <- apply(hlp[-censored, , drop = FALSE], 1, which.min)
+        else nextstate <- which.min(hlp[-censored , drop = FALSE])
         reachAbsorb <- (1:nstart)[-censored][which(tostates[nextstate] %in%
           absorbing)]
       }
       else {
-        nextstate <- apply(hlp, 1, which.min)
+        if (!is.null(dim(time))) nextstate <- apply(hlp, 1, which.min)
+        else nextstate <- which.min(hlp)
         reachAbsorb <- (1:nstart)[which(tostates[nextstate] %in%
           absorbing)]
       }
@@ -1213,8 +1231,14 @@ msprepEngine <- function (time, status, id, starttime, startstate, trans, origin
     }
   }
   if (length(to.remove) > 0) {
-    time <- time[-to.remove, ]
-    status <- status[-to.remove, ]
+    if (!is.null(dim(time))){
+      time <- time[-to.remove, ]
+      status <- status[-to.remove, ]
+    }
+    else {
+      time <- time[-to.remove]
+      status <- status[-to.remove]
+    }
     newtime <- newtime[-to.remove]
     newstate <- newstate[-to.remove]
     id <- id[-to.remove]
