@@ -21,6 +21,7 @@
     \item{\code{probabilities}:}{Object of class \code{"matrix"}: posterior Probabilities to be in each state at each time }
     \item{\code{lower}:}{Object of class \code{"matrix"}: lower prediction bound to be in each state at each time }
     \item{\code{upper}:}{Object of class \code{"matrix"}: upper prediction bound to be in each state at each time }
+    \item{\code{type}:}{Object of class \code{"character"}: describes type of probability}
   }
 }
 \section{Methods}{
@@ -37,8 +38,9 @@
 }
 
 \seealso{
-  \code{\link{posteriorProbabilities}}, \code{\link{ArtCohort-class}},
-  
+  \code{\link{transitionProbabilities}},  
+  \code{\link{cummulativeIncidence}},
+  \code{\link{ArtCohort-class}}
 }
 \examples{
 showClass("PosteriorProbabilities")

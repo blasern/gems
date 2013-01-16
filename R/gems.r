@@ -34,7 +34,7 @@ setClass("ArtCohort",
            ))
 
 setClass("PosteriorProbabilities", representation(states =  "character", times =  "numeric", probabilities = "matrix",
-                                                  lower= "matrix", upper = "matrix"))
+                                                  lower= "matrix", upper = "matrix", type="character"))
 
 
 # methods
@@ -66,7 +66,7 @@ setMethod( "possibleTransitions", "transition.structure", function(object){
   rownames(aux4) <-  character()
   aux4
 })
-setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste("Probability after starting in State", x@states[1], "at time 0"), states=1:dim(x@probabilities)[2],
+setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste(x@type, "after starting in State", x@states[1], "at time 0"), states=1:dim(x@probabilities)[2],
                                                      lwd=c(2,2), col=c('blue','green3'), lty=c(1,2), xlab="Time", ylab="Probability", ...){
   if (ci){
     plotPrevalence(x@times, x@probabilities, x@states, lower=x@lower, upper=x@upper, main=main, states=states,
@@ -708,9 +708,84 @@ posteriorProbabilities = function(object, times, stateNames = paste("State", as.
   pp@probabilities = prev
   pp@lower = lower
   pp@upper = upper
+  pp@type = "Transition probabilities"
   return(pp)
 }
 
+cummulativeIncidence = function(object, times, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
+  if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
+  else cohorts <- t(object)
+  statesNumber <- dim(cohorts)[1]
+  
+  # Prediction interval:
+  if (dim(cohorts)[2]>=1000) {
+    dd <- data.frame(t(cohorts))
+    dd$cc <- c(rep(1:100, times=floor(dim(cohorts)[2])/100) , 1:(dim(cohorts)[2]%%100+1))[1:dim(cohorts)[2]]
+    dd <- split(dd,dd$cc)
+    inc <- list()
+    ppp <- NULL
+    for (ciind in 1:100){
+      cohorts <- t(dd[[ciind]][,1:statesNumber])
+      
+      if (ncol(cohorts)==0) {
+        inc[[ciind]] <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
+      }
+      if (ncol(cohorts)==1) {
+        inc[[ciind]] <- matrix(0, ncol = nrow(cohorts), nrow = length(times))
+        for (tInd in 1:(nrow(cohorts))) {
+          inc[[ciind]][times >= cohorts[tInd] , tInd] <- 1
+        }
+      }
+      if (ncol(cohorts)>=2) {
+        prep1 <- gems:::data_prep(cohorts, max(times))
+        prep1 <- prep1[!(prep1$Tstart == prep1$Tstop), ]
+        prepData <- gems:::msmDataPrep(prep1)
+        inc[[ciind]] <- incidence(prepData, times, dim(cohorts)[1])
+      }
+      ppp <- rbind(ppp,inc[[ciind]])
+    }
+    ddd <- data.frame(ppp)
+    ddd$times <- times
+    
+    inc <- as.matrix(ddply(ddd, .(times), function(x) colMeans(x)))[, 1:statesNumber]
+    lower <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .025)})))[, 1:statesNumber]
+    upper <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .975)})))[, 1:statesNumber]
+  }
+  
+  else {
+    if (ncol(cohorts)==0) {
+      inc <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
+    }
+    if (ncol(cohorts)==1) {
+      inc <- matrix(0, ncol = nrow(cohorts), nrow = length(times))
+      for (tInd in 1:(nrow(cohorts))) {
+        inc[times >= cohorts[tInd] , tInd] <- 1
+      }
+    }
+    if (ncol(cohorts)>=2) {
+      prep1 <- data_prep(cohorts, max(times))
+      prep1 <- prep1[!(prep1$Tstart == prep1$Tstop), ]
+      prepData <- msmDataPrep(prep1)
+      inc <- incidence(prepData, times, dim(cohorts)[1])
+    }
+    lower <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
+    upper <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
+  }
+  
+  dimnames(inc) <- list(paste("Time", times), stateNames)
+  dimnames(lower) <- list(paste("Time", times), stateNames)
+  dimnames(upper) <- list(paste("Time", times), stateNames)
+    
+  pp = new("PosteriorProbabilities")
+  pp@states = stateNames
+  pp@times = times
+  pp@probabilities = inc
+  pp@lower = lower
+  pp@upper = upper
+  pp@type = "Cummulative incidence"
+  return(pp)
+}
+transitionProbabilities <- posteriorProbabilities
 prepareF <-
   function (func, known, historyl, historyp = numeric(2), blp = numeric(2))
 {
@@ -743,7 +818,6 @@ prepareF <-
 prevalence <-
   function (data, times, states_number)
 {
-  #states_number <- max(data$state)
   states <- array(0, dim = c(length(times), max(data$id)))
   for (i in 1:max(data$id)) {
     ti <- data$time[data$id == i]
@@ -758,6 +832,24 @@ prevalence <-
   }
   prev <- prev/length(unique(data$id))
   return(prev)
+}
+incidence <-
+  function (data, times, states_number)
+{
+  spl <- split(data, factor(data$state, levels=1:states_number))
+  inc <- matrix(0, ncol = states_number, nrow = length(times))
+  for (i in 1:states_number){
+    if (dim(spl[[i]])[1]>0){
+      sti <- sapply(times, function(x) x>=spl[[i]]$time)
+      if (dim(spl[[i]])[1]>1) inc[,i] <- colSums(sti)
+      else inc[,i] <- sti
+    }
+    else {
+      inc[,i] <- 0
+    }
+  }
+  inc <- inc/length(unique(data$id))
+  return(inc)
 }
 sampler <-
   function (n, f, to = 100, length = 1000)

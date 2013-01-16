@@ -1,6 +1,8 @@
 ﻿--------------------------
 ---- ChangeLog - gems ----
 --------------------------
+2013-01-16 Nello Blaser (version 0.84)
+	* Added cummulative incidence
 2013-01-07 Luisa Salazar 
 	* Changed names of formals and representations
 	* Adjusted man to be consistent with new names

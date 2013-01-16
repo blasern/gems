@@ -1,14 +1,14 @@
-\name{posteriorProbabilities}
-\alias{posteriorProbabilities}
+\name{cummulativeIncidence}
+\alias{cummulativeIncidence}
 
 \title{
-  posterior probabilities
+  transition probabilities
 }
 \description{
-  Calculates the probabilities and prediction intervals after first state
+  Calculates the cummulative incidence and prediction intervals after first state
 }
 \usage{
-posteriorProbabilities(object, times, 
+cummulativeIncidence(object, times, 
   stateNames = paste("State", as.list(1:dim(cohorts)[1])))
 }
 
@@ -25,7 +25,7 @@ posteriorProbabilities(object, times,
 }
 
 \value{
-  an object of class \code{"PosteriorProbabilities"}, containing the statenames, timepoints and the posterior probabilities with pointwise prediction intervals over time.
+  an object of class \code{"PosteriorProbabilities"}, containing the statenames, timepoints and the cummulative incidence with pointwise prediction intervals over time.
 }
 
 \author{
