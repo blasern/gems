@@ -96,7 +96,7 @@ head(cohorts)
 }
 
 \seealso{
-  \code{\link{generateHazardMatrix}}, \code{\link{generateParameterMatrix}}, \code{\link{generateParameterCovarianceMatrix}}, \code{\link{ArtCohort-class}}, \code{\link{transitionProbabilities}}, \code{\link{cummulativeIncidence}}
+  \code{\link{generateHazardMatrix}}, \code{\link{generateParameterMatrix}}, \code{\link{generateParameterCovarianceMatrix}}, \code{\link{ArtCohort-class}}, \code{\link{transitionProbabilities}}, \code{\link{cumulativeIncidence}}
 }
 
 \keyword{main function}

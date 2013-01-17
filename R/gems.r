@@ -712,7 +712,7 @@ posteriorProbabilities = function(object, times, stateNames = paste("State", as.
   return(pp)
 }
 
-cummulativeIncidence = function(object, times, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
+cumulativeIncidence = function(object, times, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
   if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
   else cohorts <- t(object)
   statesNumber <- dim(cohorts)[1]
@@ -782,7 +782,7 @@ cummulativeIncidence = function(object, times, stateNames = paste("State", as.li
   pp@probabilities = inc
   pp@lower = lower
   pp@upper = upper
-  pp@type = "Cummulative incidence"
+  pp@type = "Cumulative incidence"
   return(pp)
 }
 transitionProbabilities <- posteriorProbabilities

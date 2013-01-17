@@ -47,7 +47,7 @@
   \code{\link{simulateCohort}},
   \code{\link{transition.structure-class}},
   \code{\link{transitionProbabilities}},  
-  \code{\link{cummulativeIncidence}}
+  \code{\link{cumulativeIncidence}}
 }
 \examples{
 showClass("ArtCohort")

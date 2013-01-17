@@ -39,7 +39,7 @@
 
 \seealso{
   \code{\link{transitionProbabilities}},  
-  \code{\link{cummulativeIncidence}},
+  \code{\link{cumulativeIncidence}},
   \code{\link{ArtCohort-class}}
 }
 \examples{

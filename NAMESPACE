@@ -1,4 +1,4 @@
-export(simulateCohort, generateHazardMatrix, generateParameterMatrix, generateParameterCovarianceMatrix, transitionProbabilities, cummulativeIncidence)
+export(simulateCohort, generateHazardMatrix, generateParameterMatrix, generateParameterCovarianceMatrix, transitionProbabilities, cumulativeIncidence)
 exportClasses(transition.structure, ArtCohort, PosteriorProbabilities)
 importFrom("stats", update)
 importFrom("graphics", plot)
