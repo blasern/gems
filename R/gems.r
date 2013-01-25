@@ -71,7 +71,7 @@ setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste(x
   if (ci){
     plotPrevalence(x@times, x@probabilities, x@states, lower=x@lower, upper=x@upper, main=main, states=states,
                    lwd=lwd, col=col, lty=lty, xlab=xlab, ylab=ylab, ...)
-    if (sum(complete.cases(post@lower))==0) {
+    if (sum(complete.cases(x@lower))==0) {
       warning("Too few simulations for prediction intervals")
     }
     par(mfrow=c(1,1))

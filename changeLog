@@ -1,6 +1,9 @@
 ﻿--------------------------
 ---- ChangeLog - gems ----
 --------------------------
+2013-01-25 Nello Blaser (version 0.9)
+	* Changed imports
+	* Updated manual
 2013-01-16 Nello Blaser (version 0.84)
 	* Added cumulative incidence
 2013-01-07 Luisa Salazar 

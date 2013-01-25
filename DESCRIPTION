@@ -1,8 +1,8 @@
 Package: gems
 Type: Package
 Title: General multistate simulation model
-Version: 0.84
-Date: 2012-12-27
+Version: 0.9
+Date: 2012-01-25
 Author: Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
 Maintainer: Luisa Salazar Vizcaya <lsalazar@ispm.unibe.ch>
 Imports: MASS, methods, msm, mstate, plyr, graphics, stats, utils
