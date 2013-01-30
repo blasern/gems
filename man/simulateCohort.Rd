@@ -94,7 +94,7 @@ maxTime <- 10
 
 # simulate the cohort
 cohort <- simulateCohort(
-  transitionFunction = hazardf,
+  transitionFunctions = hazardf,
   parameters = mu,
   cohortSize = cohortSize,
   to=maxTime)
