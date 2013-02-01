@@ -21,7 +21,6 @@ importFrom(MASS
 )
 importFrom(methods
 	, "new"
-	, "@<-"
 )
 importFrom(mstate
 	, "transMat"
