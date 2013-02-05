@@ -217,7 +217,7 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
   }
   for (tr in 1:length(hazardf)) {
     if (length(hazardf[[tr]]) > 0) {
-      if (class(hazardf[[tr]]) != "function") {
+      if (!is.function(hazardf[[tr]])) {
         if (hazardf[[tr]] != "Weibull" && hazardf[[tr]] !=
             "multWeibull" &&  hazardf[[tr]] != "Exponential" && hazardf[[tr]] != "impossible" &&
             !is.na(hazardf[[tr]]))
@@ -291,7 +291,7 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
   parametric = numeric()
   k = 0
   for (i in 1:max(auxcounter(statesNumber))) {
-    if (class(hazardf[[i]]) == "character") {
+    if (is.character(hazardf[[i]])) {
       k = k + 1
       parametric[k] = i
       if (hazardf[[i]] == "Weibull" || hazardf[[i]] ==
@@ -322,7 +322,7 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
       else {
         print("In this transition it reads a function that doesn't recognize")
         print(i)
-        stop("Not known parametric function")
+        stop("Unknown parametric function")
       }
     }
   }
@@ -357,13 +357,8 @@ data_prep <-
   times[times>=maxtime]<-maxtime
   status[times >= maxtime] <- FALSE
   times[status == FALSE] <- maxtime + 1
-  transList <- list()
-  for (i in 1:(states_number - 1)) {
-    transList[[i]] <- (i + 1):states_number
-  }
-  transList[[states_number]] <- states_number
-  tmat <- transMat(transList)
-  tmat[states_number, states_number] <- NA
+  tmat <- auxcounter(states_number)
+  tmat[tmat==0] <- NA
   prepData <- msprep(times, status, trans = tmat, start = list(state = 1,
                                                     time = 0))
   return(prepData)
@@ -920,9 +915,7 @@ simFunctions <-
   simpar = mvrnorm(cohortSize, aux1, covariances)
   simpar = rbind(aux2, simpar)
   auxso = so[prov]
-  simpar1 = list(cohortSize)
-  for (i in 1:cohortSize) simpar1[[i]] = fold(simpar[i + 1,
-                                   ], auxso)
+  simpar1 <- lapply(1:cohortSize, function(k) fold(simpar[k+1,], auxso))
   lp = list(lso)
   ltp = list(cohortSize)
   for (j in 1:cohortSize) {
