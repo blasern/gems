@@ -436,92 +436,79 @@ generateParameterMatrix <-
   Muclass@list.matrix <- MuMat
   return(Muclass)
 }
-historical <- function(gf,statesNumber, parametric, historyl, startingState, absorbing, bl, to){
+
+historical <- function(gf, statesNumber, parametric, historyl, startingState, absorbing, bl, to){
+  if (historyl) histH(gf, statesNumber, parametric, startingState, absorbing, bl, to)
+  else histNoH(gf, statesNumber, parametric, startingState, absorbing, bl, to)
+}
+
+histNoH <- function(gf, statesNumber, parametric, startingState, absorbing, bl, to){
+  possible <- auxcounter(statesNumber)
+  # all possible transition times
+  npar <- (1:length(gf))[!1:length(gf)%in%parametric]
+  time0 <- rep(NA,length(gf)) 
+  time0[parametric] <- unlist(lapply(gf[parametric], function(ff) samplerP(function(t) ff(t, bl=bl), n=1)))
+  time0[npar] <- unlist(lapply(gf[npar], function(ff) sampler(n=1, function(t) ff(t, bl=bl))))
+  #times in the transition matrix
+  time = matrix(ncol = statesNumber, nrow =  statesNumber)
+  time[possible!=0] <- time0
+  time[possible==0] <- 99*to
+  
+  minTimeState <- apply(time, 1, function(x) c(min(x), which.min(x)))
+  kk = startingState
+  path = rep(NA,statesNumber)
+  path[startingState]<-0
+  aux =  startingState
+  while(aux %in% setdiff(startingState:statesNumber, absorbing) && sum(path, na.rm=TRUE)<=to){
+    aux = minTimeState[2,aux]
+    path[aux] = minTimeState[1,kk] + sum(path, na.rm=TRUE)
+    kk =  aux
+  }
+  return(list(path,NULL))
+}
+
+histH <- function(gf, statesNumber, parametric, startingState, absorbing, bl, to){
   possible <- auxcounter(statesNumber)
   formerhistory <- array(0,dim =  c(max(possible), 4))
   eventTimes   <-  matrix(NA, ncol = statesNumber ,nrow= 1)
-  if (historyl ==FALSE){
-    time0  = numeric(length(gf))
-    time = matrix(0,ncol = statesNumber, nrow =  statesNumber)   #times in the transition matrix
-    for(i in startingState:length(gf)){
-      auxfnh = function(t) return(gf[[i]](t, bl = bl)) #setting baseline
-      if (is.element(i,parametric))  time0[i] = samplerP(f = auxfnh, n = 1)
-      else time0[i] = sampler(n = 1,f = auxfnh)
-      time[auxposition(possible,i)[1],auxposition(possible,i)[2]] =  time0[i]}
-    time[possible == 0] = 99*to
-    auxpath  =  matrix(nrow = statesNumber,ncol = 2)
-    mintimes = unlist(apply(time,1,min))
-    wheremin = unlist(apply(time,1,which.min))
-    auxpath[,1] = wheremin
-    auxpath[,2] = mintimes
-    kk = startingState
-    path =  rep(NA,statesNumber)
-    path[startingState]<-0
-    aux =  startingState
-    while(aux %in% setdiff(startingState:statesNumber, absorbing) && max(path, na.rm=TRUE)<=to){
-      aux = wheremin[aux]
-      path[aux] = mintimes[kk] + sum(path, na.rm=TRUE)
-      kk =  aux
-    }
-    return(list(path,NULL))
+  aux = possible[startingState,]; aux = aux[aux !=0]
+  par = match(intersect(aux,parametric),aux)
+  f =  gf[aux]; rm(aux)
+  npar <- (1:length(f))[!1:length(f)%in%par]
+  time = numeric(length(f))
+  time[par] <- unlist(lapply(f[par], function(ff) samplerP(function(t) ff(t, history=0, bl=bl), n=1)))
+  time[npar] <- unlist(lapply(f[npar], function(ff) sampler(n=1, function(t) ff(t, history=0, bl=bl),to=to)))
+  #########################################
+  mt = min(time)
+  wmin = which.min(time)
+  first <- possible[startingState, startingState+wmin]
+  k = auxposition(possible, max(first))[2]  #current state of the patient
+  formerhistory[startingState+wmin-1,1:4] = c(first, mt, mt, k)
+  lim = mt
+  ######## loop over states...
+  while(k %in% setdiff(startingState:statesNumber, absorbing) && lim <= to){
+    aux = possible[auxposition(possible, max(na.rm = TRUE,formerhistory[,1]))[2],]; aux =  aux[aux !=0]
+    f =  gf[aux]
+    par = match(intersect(aux,parametric),aux)  #those index of f (possible transition hazards corespond to parametric)
+    npar <- (1:length(f))[!1:length(f)%in%par]
+    
+    timesp  =  numeric(length(f))
+    timesp[par] <- unlist(lapply(f[par], function(ff) samplerP(function(t) ff(t, history=formerhistory[,2], bl=bl), n=1)))
+    timesp[npar] <- unlist(lapply(f[npar], function(ff) sampler(n=1, function(t) ff(t, history=formerhistory[,2], bl=bl),to=to)))
+    
+    mt = min(timesp)
+    wmin = which.min(timesp)
+    auxmin <- aux[wmin]
+    
+    lim = mt + formerhistory[max(formerhistory[,1]) ,3]
+    k = auxposition(possible, max(auxmin))[2]
+    
+    formerhistory[auxmin,1:4] = c(auxmin, mt, lim, k)
   }
-
-  else { #History =  TRUE
-    aux = possible[startingState,]; aux = aux[aux !=0];
-    par = match(intersect(aux,parametric),aux)
-    f =  gf[aux]; rm(aux)
-    time = numeric(length(f))
-    for(i in 1:length(f)){
-      auxfhnl = function(t) return(f[[i]](t, history = numeric(200), bl = bl))
-      if (is.element(i,par))  {time[i] = samplerP(f = auxfhnl, n = 1)}
-      else {
-        time[i] = sampler(n = 1,f = auxfhnl, to=to)
-      }
-    }
-    #########################################
-    mt = min(time)
-    wmin = which(time == mt)
-
-    formerhistory[startingState+wmin-1,1] = possible[startingState, startingState+wmin] # diag 0/ upper
-    formerhistory[startingState+wmin-1,2] = mt
-    formerhistory[startingState+wmin-1,3] = mt
-
-    k = auxposition(possible, max(formerhistory[,1]))[2]  #current state of the patient
-    #            outputCohort[,1:3] = formerhistory[,1:3]
-    formerhistory[startingState+wmin-1,4]   = k
-    lim =   mt
-    #while(k < (statesNumber) && lim <= T ){ ### rembember  to change: patients are now dying in two diff states
-    while(k %in% setdiff(startingState:statesNumber, absorbing) && lim <= to){
-      aux =       possible[auxposition(possible, max(na.rm = TRUE,formerhistory[,1]))[2],]; aux =  aux[aux !=0]
-      f =  gf[aux]
-
-      par = match(intersect(aux,parametric),aux)  #those index of f (possible transition hazards corespond to parametric)
-
-      timesp  =  numeric(length(f))
-
-      for(j in 1:length(f)){
-        ff =  f[[j]]
-        auxfhnl = function(t){return(ff(t, history =  formerhistory[,2], bl = bl))}
-        if (is.element(j,par))  timesp[j] = samplerP(f = auxfhnl,n = 1)
-        else     {
-          timesp[j] = sampler(f = auxfhnl,n = 1, to=to)}
-      }
-      mt = min(timesp)
-      wmin = which(timesp == mt)
-
-      formerhistory[(aux)[wmin],3] = mt + formerhistory[max(formerhistory[,1]) ,3]
-      lim =           formerhistory[(aux)[wmin],3]
-      formerhistory[(aux)[wmin],2] = mt
-      formerhistory[(aux)[wmin],1] = (aux)[wmin]
-      k = auxposition(possible, max(formerhistory[,1]))[2]
-
-      formerhistory[aux[wmin],4]   = k
-    }
-    for(st in startingState:statesNumber){
-      if(length(which(formerhistory[,4]==st)) == 0)
-        eventTimes[1,st] = ifelse(st==startingState, 0, NA)
-      else  eventTimes[1,st] = formerhistory[which(formerhistory[,4]==st)[1],3]
-    }
+  for(st in startingState:statesNumber){
+    if(length(which(formerhistory[,4]==st)) == 0)
+      eventTimes[1,st] = ifelse(st==startingState, 0, NA)
+    else  eventTimes[1,st] = formerhistory[which(formerhistory[,4]==st)[1],3]
   }
   return(list(eventTimes, NULL))
 }
