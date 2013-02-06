@@ -416,7 +416,8 @@ generateParameterMatrix <-
       lengthMu[trans] <- switch(hf[[trans]], 
                                 Weibull=2,
                                 multWeibull=3,
-                                Exponential=1)
+                                Exponential=1, 
+                                impossible=0)
     }
     else if (class(hf[[trans]]) == "function") {
       if (length(formals(hf[[trans]])) > 0) {
@@ -859,7 +860,13 @@ simFunctions <-
     }
   }
 
-  simpar = mvrnorm(cohortSize, aux1, covariances)
+  if (sum(covariances !=0)){
+    simpar = mvrnorm(cohortSize, aux1, covariances)
+  }
+  else{
+    simpar <- matrix(aux1, nrow=cohortSize, ncol=length(aux1), byrow=TRUE)
+  }
+  
   simpar = rbind(aux2, simpar)
   auxso = so[prov]
   simpar1 <- lapply(1:cohortSize, function(k) fold(simpar[k+1,], auxso))
