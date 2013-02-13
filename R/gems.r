@@ -270,9 +270,9 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
             stop("direct out of bounds")
     }
   if (cohortSize>1) {try(bl0 <- as.matrix(bl0))}
-  else {try(bl0 <- t(as.matrix(bl0)))}
+  else if (is.null(dim(bl0))) {try(bl0 <- t(as.matrix(bl0)))}
   if (nrow(bl0) != cohortSize)
-    warning("bl0 is not of the right dimension")
+    warning("baseline is not of the right dimension")
   try(to <- as.numeric(to))
   if (length(to) > 1)
     warning("to has length > 1 and only the first element will be used")
@@ -580,7 +580,7 @@ plotPrevalence <-
   }
 }
 
-posteriorProbabilities = function(object, times, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
+posteriorProbabilities = function(object, times, M=100, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
   if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
   else cohorts <- t(object)
   statesNumber <- dim(cohorts)[1]
@@ -588,11 +588,11 @@ posteriorProbabilities = function(object, times, stateNames = paste("State", as.
   # Prediction interval:
   if (dim(cohorts)[2]>=1000) {
     dd <- data.frame(t(cohorts))
-    dd$cc <- c(rep(1:100, times=floor(dim(cohorts)[2])/100) , 1:(dim(cohorts)[2]%%100+1))[1:dim(cohorts)[2]]
+    dd$cc <- c(rep(1:M, times=floor(dim(cohorts)[2])/M) , 1:(dim(cohorts)[2]%%M+1))[1:dim(cohorts)[2]]
     dd <- split(dd,dd$cc)
     prev <- list()
     ppp <- NULL
-    for (ciind in 1:100){
+    for (ciind in 1:M){
       cohorts <- t(dd[[ciind]][,1:statesNumber])
       if (ncol(cohorts)==0) {
         prev[[ciind]] <- matrix(NA, ncol = nrow(cohorts), nrow = length(times))
@@ -655,7 +655,7 @@ posteriorProbabilities = function(object, times, stateNames = paste("State", as.
   return(pp)
 }
 
-cumulativeIncidence = function(object, times, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
+cumulativeIncidence = function(object, times, M=100, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
   if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
   else cohorts <- t(object)
   statesNumber <- dim(cohorts)[1]
@@ -663,11 +663,11 @@ cumulativeIncidence = function(object, times, stateNames = paste("State", as.lis
   # Prediction interval:
   if (dim(cohorts)[2]>=1000) {
     dd <- data.frame(t(cohorts))
-    dd$cc <- c(rep(1:100, times=floor(dim(cohorts)[2])/100) , 1:(dim(cohorts)[2]%%100+1))[1:dim(cohorts)[2]]
+    dd$cc <- c(rep(1:M, times=floor(dim(cohorts)[2])/M) , 1:(dim(cohorts)[2]%%M+1))[1:dim(cohorts)[2]]
     dd <- split(dd,dd$cc)
     inc <- list()
     ppp <- NULL
-    for (ciind in 1:100){
+    for (ciind in 1:M){
       cohorts <- t(dd[[ciind]][,1:statesNumber])
       
       if (ncol(cohorts)==0) {
