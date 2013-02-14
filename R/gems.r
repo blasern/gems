@@ -202,81 +202,37 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
           startingStates = rep(1, cohortSize), absorbing=cohortSize, impossible = NULL, fixpar = NULL,
           direct = NULL, bl0 = matrix(0, nrow = cohortSize), to = 100)
 {
-  try(statesNumber <- as.integer(statesNumber))
-  if (length(statesNumber) > 1)
-    warning("statesNumber has length > 1 and only the first element will be used")
-  statesNumber <- statesNumber[1]
-  try(class(hazardf) <- "list")
-  if (is.matrix(hazardf)) {
-    hazardf <- t(hazardf)[t(auxcounter(statesNumber)) > 0]
-  }
-  if (length(hazardf) > (statesNumber * (statesNumber - 1)/2))
-      stop("hazardf is not consistent with the number of states")
+  hazardf <- t(hazardf)[t(auxcounter(statesNumber)) > 0]
+
   if (length(hazardf) < (statesNumber * (statesNumber - 1)/2)) {
     length(hazardf) <- statesNumber * (statesNumber - 1)/2
   }
   for (tr in 1:length(hazardf)) {
     if (length(hazardf[[tr]]) > 0) {
       if (!is.function(hazardf[[tr]])) {
-        if (hazardf[[tr]] != "Weibull" && hazardf[[tr]] !=
-            "multWeibull" &&  hazardf[[tr]] != "Exponential" && hazardf[[tr]] != "impossible" &&
+        if (!hazardf[[tr]] %in% c("Weibull", "multWeibull", "Exponential", "impossible") &&
             !is.na(hazardf[[tr]]))
           try(hazardf[[tr]] <- as.function(hazardf[[tr]]))
       }
     }
   }
-  try(cohortSize <- as.integer(cohortSize))
-  if (length(cohortSize) > 1)
-    warning("cohortSize has length > 1 and only the first element will be used")
-  cohortSize <- cohortSize[1]
-  try(class(mu) <- "list")
-  if (is.matrix(mu)) {
-    mu <- as.list(unlist(t(mu), recursive = FALSE))
-  }
+
+  mu <- as.list(unlist(t(mu), recursive = FALSE))
+  
   if (length(mu) > 0) {
-    for (ind in 1:length(mu)) {
-            try(mu[[ind]] <- as.numeric(mu[[ind]]))
-          }
+    mu <- lapply(mu, as.numeric)
   }
-  try(sigma <- as.matrix(sigma))
-  if (dim(sigma)[1] != dim(sigma)[2])
-    stop("sigma is not a square matrix")
+
   if (dim(sigma)[1] != length(unlist(mu)))
-    stop("size of mu and sigma are inconsistent")
-  try(historyl <- as.logical(historyl))
-  if (length(historyl) > 1)
-    warning("historyl has length > 1 and only the first element will be used")
-  historyl <- historyl[1]
-  try(startingStates <- as.numeric(startingStates))
-  if (length(startingStates) == 1)
-    rep(startingStates, cohortSize)
-  if (!(length(startingStates) %in% c(1, cohortSize)))
-    stop("invalid length of startingState")
-  if (sum(startingStates %in% 1:cohortSize) != cohortSize)
-    stop("startingState out of bounds")
-  try(impossible <- as.integer(impossible))
-  if (length(impossible) > 0) {
-    if (min(impossible) < 1 || max(impossible) > (statesNumber * (statesNumber - 1)/2))
-      stop("impossible out of bounds")
-  }
-  try(fixpar <- as.integer(fixpar))
-  if (length(fixpar) > 0) {
-    if (min(fixpar) < 1 || max(fixpar) > (statesNumber * (statesNumber - 1)/2))
-      stop("fixpar out of bounds")
-  }
-  try(direct <- as.integer(direct))
-  if (length(direct) > 0) {
-    if (min(direct) < 1 || max(direct) > (statesNumber * (statesNumber - 1)/2))
-            stop("direct out of bounds")
-    }
+    stop("size of parameters and parameterCovariances are inconsistent")
+
+  if (length(startingStates) == 1) rep(startingStates, cohortSize)
+
   if (cohortSize>1) {try(bl0 <- as.matrix(bl0))}
   else if (is.null(dim(bl0))) {try(bl0 <- t(as.matrix(bl0)))}
   if (nrow(bl0) != cohortSize)
     warning("baseline is not of the right dimension")
-  try(to <- as.numeric(to))
-  if (length(to) > 1)
-    warning("to has length > 1 and only the first element will be used")
-  to <- to[1]
+  
   for (i in 1:length(hazardf)) {
     if (is.element(i, impossible)) {
             if (historyl == FALSE)
@@ -299,9 +255,7 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
         if (!historyl) formals(hazardf[[i]])$history <- NULL
       }
       else {
-        print("In this transition it reads a function that doesn't recognize")
-        print(i)
-        stop("Unknown parametric function")
+        stop(paste("Transition function for transition", i, "not recognized", sep=" "))
       }
     }
   }
@@ -898,7 +852,30 @@ simulateCohort <-
            initialState=rep(1, cohortSize),
            absorbing=transitionFunctions@states.number,
            to=100){
-
+    
+    try(cohortSize <- as.integer(cohortSize))
+    if (length(cohortSize) > 1)
+      warning("cohortSize has length > 1 and only the first element will be used")
+    cohortSize <- cohortSize[1]
+    
+    try(to <- as.numeric(to))
+    if (length(to) > 1)
+      warning("to has length > 1 and only the first element will be used")
+    to <- to[1]
+    
+    stopifnot(cohortSize>0, 
+              is.list(transitionFunctions@list.matrix),
+              is.list(parameters@list.matrix),
+              is.list(parameterCovariances@list.matrix),
+              dim(transitionFunctions@list.matrix)[1]==dim(transitionFunctions@list.matrix)[2],
+              identical(dim(transitionFunctions@list.matrix), dim(parameters@list.matrix)),
+              identical(dim(parameters@list.matrix), dim(parameterCovariances@list.matrix)),
+              identical(dim(transitionFunctions@list.matrix), dim(timeToTransition)), 
+              initialState %in% 1:cohortSize,
+              absorbing %in% 1:cohortSize,
+              length(initialState) %in% c(1, cohortSize)
+              )
+      
     transitionFunction  =  transitionFunctions@list.matrix
     parameterCovariance =  parameterCovariances@list.matrix
     parameters.in =  parameters@list.matrix
@@ -974,7 +951,6 @@ simulateCohort <-
                             absorbing=absorbing,
                             to=to)
     cohort[cohort>to] <- NA
-    #cohort[1,] <- 0
 
     simulatedcohort <- new("ArtCohort")
     simulatedcohort@baseline <- as.matrix(baseline)
