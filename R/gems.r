@@ -863,6 +863,8 @@ simulateCohort <-
       warning("to has length > 1 and only the first element will be used")
     to <- to[1]
     
+    statesNumber <- dim(transitionFunctions@list.matrix)[1]
+    
     stopifnot(cohortSize>0, 
               is.list(transitionFunctions@list.matrix),
               is.list(parameters@list.matrix),
@@ -871,8 +873,8 @@ simulateCohort <-
               identical(dim(transitionFunctions@list.matrix), dim(parameters@list.matrix)),
               identical(dim(parameters@list.matrix), dim(parameterCovariances@list.matrix)),
               identical(dim(transitionFunctions@list.matrix), dim(timeToTransition)), 
-              initialState %in% 1:cohortSize,
-              absorbing %in% 1:cohortSize,
+              initialState %in% 1:statesNumber,
+              absorbing %in% 1:statesNumber,
               length(initialState) %in% c(1, cohortSize)
               )
       
@@ -880,7 +882,6 @@ simulateCohort <-
     parameterCovariance =  parameterCovariances@list.matrix
     parameters.in =  parameters@list.matrix
 
-    statesNumber <- dim(transitionFunction)[1]
     historyDep <- length(grep(c("history"), transitionFunction))>0
 
     impossible=matrix(FALSE, nrow=dim(transitionFunction)[1], ncol=dim(transitionFunction)[1])
