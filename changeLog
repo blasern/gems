@@ -1,9 +1,8 @@
 ﻿--------------------------
 ---- ChangeLog - gems ----
 --------------------------
-2013-02-14 Nello Blaser (version 0.91)
+2013-02-14 Nello Blaser (version 0.9.1)
 	* Added groups for confidence intervals
-	* Internal changes and bug fixes
 	* Slightly faster
 2013-02-01 Luisa Salazar Vizcaya
 	* Uploaded version 0.9 to CRAN
