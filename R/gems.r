@@ -438,7 +438,7 @@ histH <- function(gf, statesNumber, parametric, startingState, absorbing, bl, to
   wmin = which.min(time)
   first <- possible[startingState, startingState+wmin]
   k = auxposition(possible, max(first))[2]  #current state of the patient
-  formerhistory[startingState+wmin-1,1:4] = c(first, mt, mt, k)
+  formerhistory[possible[startingState,startingState+1]+wmin-1,1:4] = c(first, mt, mt, k)
   lim = mt
   ######## loop over states...
   while(k %in% setdiff(startingState:statesNumber, absorbing) && lim <= to){
