@@ -403,7 +403,7 @@ histNoH <- function(gf, statesNumber, parametric, startingState, absorbing, bl, 
   npar <- (1:length(gf))[!1:length(gf)%in%parametric]
   time0 <- rep(NA,length(gf))
   time0[parametric] <- unlist(lapply(gf[parametric], function(ff) samplerP(function(t) ff(t, bl=bl), n=1)))
-  time0[npar] <- unlist(lapply(gf[npar], function(ff) sampler(n=1, function(t) ff(t, bl=bl))))
+  time0[npar] <- unlist(lapply(gf[npar], function(ff) sampler(n=1, function(t) ff(t, bl=bl), to=to)))
   #times in the transition matrix
   time = matrix(ncol = statesNumber, nrow =  statesNumber)
   time[unlist(lapply(1:max(possible), function(i) which(possible == i)))] <- time0
