@@ -7,5 +7,6 @@ Author: Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
 Maintainer: Luisa Salazar Vizcaya <lsalazar@ispm.unibe.ch>
 Imports: MASS, methods, msm, mstate, plyr, graphics, stats, utils
 Depends: methods
+Suggests: parallel
 Description: This package allows to simulating and analyzing multistate models with general hazard functions. It provides functionality for the preparation of hazard functions and parameters, simulation from a general multistate model and predicting future events. The multistate model is not required to be a Markov model and may take the history of previous events into account. In the basic version, it allows to simulate from transition-specific hazard function, whose parameters are multivariable normally distributed.
 License: GPL-2
