@@ -272,6 +272,7 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
   if (try(require(parallel)) & cohortSize >= 500) {
     ncores <- 2 # or ncores <- detectCores(logical = FALSE)
     cl <- makeCluster(ncores)
+    clusterSetRNGStream(cl)
     cohorts <- parSapply(cl, 1:cohortSize, FUN=function(i){
       gems:::historical(gf = allFunctions[[i]],
                         statesNumber = statesNumber, parametric = parametric,
