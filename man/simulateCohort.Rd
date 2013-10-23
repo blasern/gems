@@ -12,7 +12,7 @@
 simulateCohort(transitionFunctions, 
   parameters, 
   cohortSize = 1000, 
-  parameterCovariances = FALSE, 
+  parameterCovariances = generateParameterCovarianceMatrix(parameters), 
   timeToTransition = array(FALSE, dim = dim(transitionFunctions@list.matrix)),
   baseline = matrix(NA,nrow = cohortSize), 
   initialState=rep(1, cohortSize),

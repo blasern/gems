@@ -254,7 +254,7 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
       if (hazardf[[i]] %in% c("Weibull", "multWeibull", "Exponential")) {
         hazardf[[i]] <- switch(hazardf[[i]],
                                Weibull=function(t, shape, scale, history, bl) rweibull(t, shape, scale),
-                               multWeibull=function(t, w, shapes, scales, history, bl) gems:::multPar(t, w, shapes, scales),
+                               multWeibull=function(t, w, shapes, scales, history, bl) multPar(t, w, shapes, scales),
                                Exponential=function(t, rate, history, bl) rexp(t, rate))
         if (!historyl) formals(hazardf[[i]])$history <- NULL
       }
@@ -264,34 +264,18 @@ function (hazardf, statesNumber, cohortSize, mu, sigma = matrix(0,
     }
   }
 
-  allFunctions <- gems:::mainFunctions(statesNumber = statesNumber,
+  allFunctions = mainFunctions(statesNumber = statesNumber,
     Mu = mu, sigma = sigma, cohortSize = cohortSize, history = historyl,
     hazardf, impossible = c(impossible, fixpar, direct))
   parametric = sort(c(parametric, impossible, direct))
-  # parallelize if possible
-  if (try(require(parallel)) & cohortSize >= 500) {
-    ncores <- 2 # or ncores <- detectCores(logical = FALSE)
-    cl <- makeCluster(ncores)
-    clusterSetRNGStream(cl)
-    cohorts <- parSapply(cl, 1:cohortSize, FUN=function(i){
-      gems:::historical(gf = allFunctions[[i]],
-                        statesNumber = statesNumber, parametric = parametric,
-                        historyl = historyl, startingState = startingStates[i],
-                        absorbing=absorbing, bl = bl0[i, ], to = to, sampler.steps = sampler.steps)[[1]]
-    })
-    stopCluster(cl)
-  }
-  # or don't 
-  else {
-    cohorts <- sapply(1:cohortSize, function(i){
-      if ((i%%report.every == 0)| (i ==1)) message("Simulating patient:" ,i) ;
-      gems:::historical(gf = allFunctions[[i]],
-                        statesNumber = statesNumber, parametric = parametric,
-                        historyl = historyl, startingState = startingStates[i],
-                        absorbing=absorbing, bl = bl0[i, ], to = to, sampler.steps = sampler.steps)[[1]]
-    })
-  }
-  #
+
+  cohorts <- sapply(1:cohortSize, function(i){
+      if ((i%%report.every ==0)| (i ==1)) message("Simulating patient:" ,i) ;
+
+      historical(gf = allFunctions[[i]],
+                                                         statesNumber = statesNumber, parametric = parametric,
+                                                         historyl = historyl, startingState = startingStates[i],
+                                                         absorbing=absorbing, bl = bl0[i, ], to = to, sampler.steps = sampler.steps)[[1]]})
   dimnames(cohorts) <- list(paste("State", 1:statesNumber),
                             paste("Patient", 1:cohortSize))
   return(cohorts)
@@ -920,7 +904,7 @@ simulateCohort <-
   function(transitionFunctions,
            parameters,
            cohortSize=1000,
-           parameterCovariances=FALSE,
+           parameterCovariances=generateParameterCovarianceMatrix(parameters),
            timeToTransition=array(FALSE, dim = dim(transitionFunctions@list.matrix)),
            baseline=matrix(NA, nrow = cohortSize),
            initialState=rep(1, cohortSize),
