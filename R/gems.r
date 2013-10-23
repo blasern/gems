@@ -494,20 +494,19 @@ mainFunctions <-
 
 }
 msmDataPrep <-
-  function (mstateDataPrep)
-{
-  a <- mstateDataPrep
-  cohortSize <- max(a$id)
-  initState <- sapply(1:cohortSize, function(ID) min(a$from[a$id==ID]))
-  unsortedId <- c(a$id[a$status == 1], seq(1, cohortSize))
-  unsortedTime <- c(a$Tstop[a$status == 1], rep(0, cohortSize))
-  unsortedState <- c(a$to[a$status == 1], initState)
-  unsortedData <- data.frame(unsortedId, unsortedTime, unsortedState)
-  sortedData <- unsortedData[order(unsortedId, unsortedTime),
-                             ]
-  msmData <- data.frame(id = sortedData$unsortedId, time = sortedData$unsortedTime,
-                        state = sortedData$unsortedState)
-}
+  function (a)
+  {
+    from <- id <- V1 <- NULL 
+    cohortSize <- max(a$id)
+    initState <- data.table(a)[,min(from), by=id][,V1]
+    unsortedId <- c(a$id[a$status == 1], seq(1, cohortSize))
+    unsortedTime <- c(a$Tstop[a$status == 1], rep(0, cohortSize))
+    unsortedState <- c(a$to[a$status == 1], initState)
+    unsortedData <- data.frame(unsortedId, unsortedTime, unsortedState)
+    sortedData <- unsortedData[order(unsortedId, unsortedTime),]
+    msmData <- data.frame(id = sortedData$unsortedId, time = sortedData$unsortedTime,
+                          state = sortedData$unsortedState)
+  }
 multPar <-
   function (t, w, shape, scale)
 {
