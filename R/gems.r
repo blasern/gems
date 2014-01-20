@@ -648,9 +648,9 @@ cumulativeIncidence = function(object, times, M=100, stateNames = paste("State",
         }
       }
       if (ncol(cohorts)>=2) {
-        prep1 <- gems:::data_prep(cohorts, max(times))
+        prep1 <- data_prep(cohorts, max(times))
         prep1 <- prep1[!(prep1$Tstart == prep1$Tstop), ]
-        prepData <- gems:::msmDataPrep(prep1)
+        prepData <- msmDataPrep(prep1)
         inc[[ciind]] <- incidence(prepData, times, dim(cohorts)[1])
       }
       ppp <- rbind(ppp,inc[[ciind]])
