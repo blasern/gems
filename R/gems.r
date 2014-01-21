@@ -38,18 +38,18 @@ setClass("PosteriorProbabilities", representation(states =  "character", times =
 
 
 # methods
-setMethod("[[", "transition.structure", function(x, i, j){
+setMethod("[[", "transition.structure", function(x, i, j, ..., exact=TRUE){
   x@list.matrix[[i,j]]
 })
 setMethod("[[<-", "transition.structure", function(x, i, j, value){
   x@list.matrix[[i,j]] <- value
   return(x)
 })
-setMethod("[", "PosteriorProbabilities", function(x, i, j){
-  x@probabilities[i,j]
+setMethod("[", "PosteriorProbabilities", function(x, i, j, ..., drop=TRUE){
+  x@probabilities[i,j, ..., drop=TRUE]
 })
-setMethod("[", "ArtCohort", function(x, i, j){
-  x@time.to.state[i,j]
+setMethod("[", "ArtCohort", function(x, i, j, ..., drop=TRUE){
+  x@time.to.state[i,j, ..., drop=TRUE]
 })
 possibleTransitions = function(object) 0
 implicitGeneric("possibleTransitions")
