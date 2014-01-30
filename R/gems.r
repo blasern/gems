@@ -46,10 +46,10 @@ setMethod("[[<-", "transition.structure", function(x, i, j, value){
   return(x)
 })
 setMethod("[", "PosteriorProbabilities", function(x, i, j, ..., drop=TRUE){
-  x@probabilities[i,j, ..., drop=TRUE]
+  x@probabilities[i,j, ..., drop=drop]
 })
 setMethod("[", "ArtCohort", function(x, i, j, ..., drop=TRUE){
-  x@time.to.state[i,j, ..., drop=TRUE]
+  x@time.to.state[i,j, ..., drop=drop]
 })
 possibleTransitions = function(object) 0
 implicitGeneric("possibleTransitions")
@@ -529,10 +529,10 @@ plotPrevalence <-
       par(oma = c(0, 0, 2, 0))
       for (i in states) {
         plot(times, prevalence[, i], type = "l", col = col[1],
-             lwd = lwd, ylim = c(0, 1), ylab = ylab,
+             lwd = lwd[1], lty=lty[1], ylim = c(0, 1), ylab = ylab,
              xlab = xlab, main = stateNames[[i]], ...)
-        try(lines(times, lower[,i], col=col[2], lty=lty[2]), silent=TRUE)
-        try(lines(times, upper[,i], col=col[2], lty=lty[2]), silent=TRUE)
+        try(lines(times, lower[,i], col=col[2], lty=lty[2], lwd=lwd[2]), silent=TRUE)
+        try(lines(times, upper[,i], col=col[2], lty=lty[2], lwd=lwd[2]), silent=TRUE)
       }
       mtext(main, outer = TRUE, cex = 1.5)
     }
