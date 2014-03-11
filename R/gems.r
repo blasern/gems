@@ -417,8 +417,9 @@ histNoH <- function(gf, statesNumber, parametric, startingState, absorbing, bl, 
   time = matrix(ncol = statesNumber, nrow =  statesNumber)
   time[unlist(lapply(1:max(possible), function(i) which(possible == i)))] <- time0
   time[possible==0] <- 99*to
-  
+  #
   minTimeState <- apply(time, 1, function(x) c(min(x), which.min(x)))
+  minTimeState[2, minTimeState[2, ] < 1:ncol(minTimeState)] <- NA # bugfix
   kk = startingState
   path = rep(NA,statesNumber)
   path[startingState]<-0
