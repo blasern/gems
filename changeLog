@@ -1,7 +1,7 @@
 ﻿--------------------------
 ---- ChangeLog - gems ----
 --------------------------
-2014-05-15 Nello Blaser 
+2014-05-15 Nello Blaser  (version 0.9.5)
 	* Added tavi data
 2014-03-11 Nello Blaser
 	* Bugfix (NA in startingState)
