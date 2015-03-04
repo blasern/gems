@@ -9,6 +9,18 @@
 #' @aliases ArtCohort-class [,ArtCohort-method [,ArtCohort,ANY,ANY,ANY-method
 #' summary,ArtCohort-method update,ArtCohort-method head,ArtCohort-method
 #' tail,ArtCohort-method
+#' @slot states.number Object of class \code{"numeric"}: number of states
+#' @slot size Object of class \code{"numeric"}: cohort size
+#' @slot baseline Object of class \code{"matrix"}: baseline matrix
+#' @slot follow.up Object of class \code{"numeric"}: maximum follow-up time
+#' @slot parameters Object of class \code{"transition.structure"}: input parameters 
+#' @slot parametersCovariances Object of class \code{"transition.structure"}: 
+#' input covariance matrices
+#' @slot timeToTransition Object of class \code{"matrix"}: 
+#' input timeToTransition matrix. logical components
+#' @slot transitionFunctions Object of class \code{"transition.structure"}: 
+#' input hazard functions
+#' @slot time.to.state Object of class \code{"data.frame"}: entry times for each patient into each of the states
 #' @docType class
 #' @section Objects from the Class: Objects are created by calls to the
 #' function \code{simulateCohort}.
