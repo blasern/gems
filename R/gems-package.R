@@ -1,4 +1,4 @@
-
+### Documentation for classes and data
 
 #' Class \code{"ArtCohort"}
 #' 
@@ -22,10 +22,6 @@
 #' showClass("ArtCohort")
 #' 
 NULL
-
-
-
-
 
 #' Class \code{"PosteriorProbabilities"}
 #' 
@@ -51,9 +47,30 @@ NULL
 #' 
 NULL
 
-
-
-
+#' Class \code{"transition.structure"}
+#' 
+#' This S4 class provides a structure to specify different characteristics of
+#' transitions, such as transition functions functions, parameters or parameter
+#' covariances.
+#' 
+#' 
+#' @name transition.structure-class
+#' @aliases transition.structure-class [[,transition.structure-method
+#' [[<-,transition.structure-method print,transition.structure-method
+#' @docType class
+#' @section Objects from the Class: Objects are created by calls to the
+#' functions \code{generateHazardMatrix}, \code{generateParameterMatrix},
+#' \code{generateParameterCovarianceMatrix}.
+#' @author Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
+#' @seealso \code{\link{generateHazardMatrix}},
+#' \code{\link{generateParameterMatrix}},
+#' \code{\link{generateParameterCovarianceMatrix}}
+#' @keywords classes
+#' @examples
+#' 
+#'   showClass("transition.structure")
+#' 
+NULL
 
 #' tavi data set
 #' 
@@ -82,35 +99,3 @@ NULL
 #' head(data(tavi))
 #' 
 NULL
-
-
-
-
-
-#' Class \code{"transition.structure"}
-#' 
-#' This S4 class provides a structure to specify different characteristics of
-#' transitions, such as transition functions functions, parameters or parameter
-#' covariances.
-#' 
-#' 
-#' @name transition.structure-class
-#' @aliases transition.structure-class [[,transition.structure-method
-#' [[<-,transition.structure-method print,transition.structure-method
-#' @docType class
-#' @section Objects from the Class: Objects are created by calls to the
-#' functions \code{generateHazardMatrix}, \code{generateParameterMatrix},
-#' \code{generateParameterCovarianceMatrix}.
-#' @author Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
-#' @seealso \code{\link{generateHazardMatrix}},
-#' \code{\link{generateParameterMatrix}},
-#' \code{\link{generateParameterCovarianceMatrix}}
-#' @keywords classes
-#' @examples
-#' 
-#'   showClass("transition.structure")
-#' 
-NULL
-
-
-

@@ -1036,9 +1036,8 @@ simFunctions.NoUnc <- function (so, covariances, history, statesNumber, impossib
 #' \code{parameters} for each transition are multivariate normally distributed
 #' and mutually independent.
 #' 
-#' @param transitionFunctions a \code{transition.structure} of dimension \eqn{N
-#' \times N}{N x N} that contains the hazard functions %history: vector, each
-#' element corresponds to a transition number, 0 if transition does not occur}
+#' @param transitionFunctions a \code{transition.structure} of dimension 
+#' \eqn{N \times N}{N x N} that contains the hazard functions
 #' @param parameters a \code{transition.structure} of dimension \eqn{N \times
 #' N}{N x N} that contains the parameters
 #' @param cohortSize a \code{numeric} indicating the number of patients to be
