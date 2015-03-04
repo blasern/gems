@@ -553,7 +553,7 @@ msmDataPrep <-
   {
     from <- id <- V1 <- NULL 
     cohortSize <- max(a$id)
-    initState <- data.table(a)[,min(from), by=id][,V1]
+    initState <- data.table::data.table(a)[,min(from), by=id][,V1]
     unsortedId <- c(a$id[a$status == 1], seq(1, cohortSize))
     unsortedTime <- c(a$Tstop[a$status == 1], rep(0, cohortSize))
     unsortedState <- c(a$to[a$status == 1], initState)
@@ -639,7 +639,6 @@ posteriorProbabilities = function(object, times, M=100, stateNames = paste("Stat
     ddd$times <- times
     
     prev <- as.matrix(ddply(ddd, .(times), function(x) colMeans(x)))[, 1:statesNumber]
-    #prev <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .5)})))[, 1:statesNumber]
     lower <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .025)})))[, 1:statesNumber]
     upper <- as.matrix(ddply(ddd, .(times), function(x) apply(x, 2, function(y){quantile(y, .975)})))[, 1:statesNumber]
   }
@@ -698,6 +697,7 @@ posteriorProbabilities = function(object, times, M=100, stateNames = paste("Stat
 #' @seealso \code{\link{PosteriorProbabilities-class}},
 #' \code{\link{ArtCohort-class}}, \code{\link{simulateCohort}}
 #' @keywords utilities
+#' @importFrom plyr ddply . 
 #' @export cumulativeIncidence
 cumulativeIncidence = function(object, times, M=100, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
   if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
@@ -791,6 +791,7 @@ cumulativeIncidence = function(object, times, M=100, stateNames = paste("State",
 #' @seealso \code{\link{PosteriorProbabilities-class}},
 #' \code{\link{ArtCohort-class}}, \code{\link{simulateCohort}}
 #' @keywords utilities
+#' @importFrom plyr . ddply
 #' @export transitionProbabilities
 transitionProbabilities <- posteriorProbabilities
 prepareF <-
@@ -867,7 +868,7 @@ sampler <-
     rate[is.nan(rate)] <- 0
     rate[is.na(rate)] <- 0
     rate[rate < .Machine$double.eps] <- .Machine$double.eps
-    samples = rpexp(n, rate, time)
+    samples = msm::rpexp(n, rate, time)
     if (is.nan(samples)) {
       print(rate)
     }
@@ -925,7 +926,7 @@ simFunctions <-
     }
     
     if (sum(covariances !=0)){
-      simpar = mvrnorm(cohortSize, aux1, covariances)
+      simpar = MASS::mvrnorm(cohortSize, aux1, covariances)
     }
     else{
       simpar <- matrix(aux1, nrow=cohortSize, ncol=length(aux1), byrow=TRUE)

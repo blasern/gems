@@ -83,16 +83,22 @@ NULL
 #' @name tavi
 #' @docType data
 #' @format A data frame with 194 observations on the following 7 variables.
-#' \describe{ \item{list("id")}{a character vector that contains the patient
-#' id's} \item{list("kidney")}{a numeric vector; indicator variable that show
-#' if an event has occurred} \item{list("kidney.dur")}{a numeric vector; times
+#' \describe{
+#' \item{id}{a character vector that contains the patient
+#' id's} 
+#' \item{kidney}{a numeric vector; indicator variable that show
+#' if an event has occurred} 
+#' \item{kidney.dur}{a numeric vector; times
 #' at which the events occurred or the patients were censored}
-#' \item{list("bleeding")}{a numeric vector; indicator variable that show if an
-#' event has occurred} \item{list("bleeding.dur")}{a numeric vector; times at
+#' \item{bleeding}{a numeric vector; indicator variable that show if an
+#' event has occurred} 
+#' \item{bleeding.dur}{a numeric vector; times at
 #' which the events occurred or the patients were censored}
-#' \item{list("death")}{a numeric vector; indicator variable that show if an
-#' event has occurred} \item{list("death.dur")}{a numeric vector; times at
-#' which the events occurred or the patients were censored} }
+#' \item{death}{a numeric vector; indicator variable that show if an
+#' event has occurred} 
+#' \item{death.dur}{a numeric vector; times at
+#' which the events occurred or the patients were censored} 
+#' }
 #' @keywords datasets
 #' @examples
 #' 
