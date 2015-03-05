@@ -138,7 +138,7 @@ setClass("ArtCohort",
 #' point estimate and second component for the confidence interval
 #' @param main,xlab,ylab same as any plot 
 #' @param ... arguments passed on to main method
-#' @importMethodsFrom graphics plot
+#' @importFrom graphics plot
 #' @author Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
 #' @seealso \code{\link{transitionProbabilities}},
 #' \code{\link{cumulativeIncidence}}, \code{\link{ArtCohort}}
@@ -239,25 +239,25 @@ setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(N
 })
 
 #' @rdname ArtCohort
-#' @importMethodsFrom utils head 
+#' @importFrom utils head 
 setMethod("head", "ArtCohort", function(x, ...){
   head(x@time.to.state, ...)
 })
 
 #' @rdname ArtCohort
-#' @importMethodsFrom utils tail
+#' @importFrom utils tail
 setMethod("tail", "ArtCohort", function(x, ...){
   tail(x@time.to.state, ...)
 })
 
 #' @rdname PosteriorProbabilities
-#' @importMethodsFrom utils head 
+#' @importFrom utils head 
 setMethod("head", "PosteriorProbabilities", function(x, ...){
   head(x@probabilities, ...)
 })
 
 #' @rdname PosteriorProbabilities
-#' @importMethodsFrom utils tail
+#' @importFrom utils tail
 setMethod("tail", "PosteriorProbabilities", function(x, ...){
   tail(x@probabilities, ...)
 })
