@@ -126,6 +126,7 @@ setClass("ArtCohort",
 #' point estimate and second component for the confidence interval
 #' @param main,xlab,ylab same as any plot 
 #' @param ... arguments passed on to main method
+#' @importMethodsFrom graphics plot
 #' @author Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
 #' @seealso \code{\link{transitionProbabilities}},
 #' \code{\link{cumulativeIncidence}}, \code{\link{ArtCohort}}
@@ -181,7 +182,6 @@ setMethod( "possibleTransitions", "transition.structure", function(object){
 })
 
 #' @rdname PosteriorProbabilities
-#' @importMethodsFrom graphics plot
 setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste(x@type, "after starting in State", x@states[1], "at time 0"), states=1:dim(x@probabilities)[2],
                                                      lwd=c(2,2), col=c('blue','green3'), lty=c(1,2), xlab="Time", ylab="Probability", ...){
   if (ci){
@@ -681,7 +681,7 @@ msmDataPrep <-
   {
     from <- id <- V1 <- NULL 
     cohortSize <- max(a$id)
-    initState <- data.table::data.table(a)[,min(from), by=id][,V1]
+    initState <- data.table(a)[,min(from), by=id][,V1]
     unsortedId <- c(a$id[a$status == 1], seq(1, cohortSize))
     unsortedTime <- c(a$Tstop[a$status == 1], rep(0, cohortSize))
     unsortedState <- c(a$to[a$status == 1], initState)
@@ -830,6 +830,7 @@ posteriorProbabilities = function(object, times, M=100, stateNames = paste("Stat
 #' \code{\link{ArtCohort}}, \code{\link{simulateCohort}}
 #' @keywords utilities
 #' @importFrom plyr ddply . 
+#' @importFrom data.table data.table
 #' @export cumulativeIncidence
 cumulativeIncidence = function(object, times, M=100, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
   if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
@@ -924,6 +925,7 @@ cumulativeIncidence = function(object, times, M=100, stateNames = paste("State",
 #' \code{\link{ArtCohort}}, \code{\link{simulateCohort}}
 #' @keywords utilities
 #' @importFrom plyr . ddply
+#' @importFrom data.table data.table
 #' @export transitionProbabilities
 transitionProbabilities <- posteriorProbabilities
 prepareF <-
