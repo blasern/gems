@@ -30,8 +30,8 @@ state
 Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
 }
 \seealso{
-\code{\link{PosteriorProbabilities-class}},
-\code{\link{ArtCohort-class}}, \code{\link{simulateCohort}}
+\code{\link{PosteriorProbabilities}},
+\code{\link{ArtCohort}}, \code{\link{simulateCohort}}
 }
 \keyword{utilities}
 

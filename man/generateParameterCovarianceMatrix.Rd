@@ -23,7 +23,7 @@ a matrix of mean parameters.
 Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
 }
 \seealso{
-\code{\link{transition.structure-class}},
+\code{\link{transition.structure}},
 \code{\link{generateParameterMatrix}}, \code{\link{simulateCohort}}
 }
 \keyword{utilities}

@@ -23,7 +23,7 @@ matrix of transition functions.
 Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
 }
 \seealso{
-\code{\link{transition.structure-class}},
+\code{\link{transition.structure}},
 \code{\link{simulateCohort}}
 }
 \keyword{utilities}

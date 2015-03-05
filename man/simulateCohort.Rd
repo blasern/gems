@@ -138,7 +138,7 @@ Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
 \code{\link{generateHazardMatrix}},
 \code{\link{generateParameterMatrix}},
 \code{\link{generateParameterCovarianceMatrix}},
-\code{\link{ArtCohort-class}}, \code{\link{transitionProbabilities}},
+\code{\link{ArtCohort}}, \code{\link{transitionProbabilities}},
 \code{\link{cumulativeIncidence}}
 }
 \keyword{function}
