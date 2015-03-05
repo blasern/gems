@@ -24,6 +24,8 @@
 #' @name transition.structure
 #' @aliases transition.structure [[.transition.structure
 #' [[<-.transition.structure print.transition.structure
+#' transition.structure-class [[,transition.structure-method
+#' [[<-,transition.structure-method print,transition.structure-method
 #' @docType class
 #' @section Objects from the Class: Objects are created by calls to the
 #' functions \code{generateHazardMatrix}, \code{generateParameterMatrix},
@@ -39,6 +41,8 @@
 #' \code{\link{generateParameterMatrix}},
 #' \code{\link{generateParameterCovarianceMatrix}}
 #' @keywords classes
+#' @exportClass transition.structure
+#' @exportMethod "[[" "[[<-" possibleTransitions print
 #' @examples
 #' 
 #'   showClass("transition.structure")
@@ -54,7 +58,9 @@ setClass("FuncParametersDist", representation(func =  "function", mu = "list"), 
 #' 
 #' @name ArtCohort
 #' @aliases ArtCohort [.ArtCohort summary.ArtCohort update.ArtCohort 
-#' head.ArtCohort tail.ArtCohort
+#' head.ArtCohort tail.ArtCohort ArtCohort-class [,ArtCohort-method 
+#' [,ArtCohort,ANY,ANY,ANY-method summary,ArtCohort-method 
+#' update,ArtCohort-method 
 #' @slot states.number Object of class \code{"numeric"}: number of states
 #' @slot size Object of class \code{"numeric"}: cohort size
 #' @slot baseline Object of class \code{"matrix"}: baseline matrix
@@ -82,6 +88,8 @@ setClass("FuncParametersDist", representation(func =  "function", mu = "list"), 
 #' \code{\link{transition.structure}},
 #' \code{\link{transitionProbabilities}}, \code{\link{cumulativeIncidence}}
 #' @keywords classes
+#' @exportClass ArtCohort
+#' @exportMethod "[" update head tail summary
 #' @examples
 #' 
 #' showClass("ArtCohort")
@@ -109,6 +117,10 @@ setClass("ArtCohort",
 #' @aliases PosteriorProbabilities [.PosteriorProbabilities
 #' plot.PosteriorProbabilities head.PosteriorProbabilities
 #' tail.PosteriorProbabilities
+#' PosteriorProbabilities-class [,PosteriorProbabilities-method
+#' [,PosteriorProbabilities,ANY,ANY,ANY-method [,PosteriorProbabilities-method
+#' head,PosteriorProbabilities-method tail,PosteriorProbabilities-method
+#' plot,PosteriorProbabilities-method 
 #' @docType class
 #' @section Objects from the Class: Objects are created by calls to the
 #' function \code{simulateCohort}.
@@ -131,6 +143,8 @@ setClass("ArtCohort",
 #' @seealso \code{\link{transitionProbabilities}},
 #' \code{\link{cumulativeIncidence}}, \code{\link{ArtCohort}}
 #' @keywords classes
+#' @exportClass PosteriorProbabilities
+#' @exportMethod "[" plot head tail
 #' @examples
 #' 
 #' showClass("PosteriorProbabilities")
@@ -200,7 +214,7 @@ setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste(x
 })
 
 #' @rdname ArtCohort
-#' @importMethodsFrom stats update
+#' @importFrom stats update
 setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(NA, nrow = newsize - object@size), newInitialStates=rep(1, newsize - object@size)){
   if (dim((object@parametersCovariances)@list.matrix) == c(0,0)) parameterCovariance0 = FALSE
   else parameterCovariance0 = object@parametersCovariances
@@ -816,7 +830,6 @@ posteriorProbabilities = function(object, times, M=100, stateNames = paste("Stat
 #' Calculates the cumulative incidence and prediction intervals after first
 #' state
 #' 
-#' 
 #' @param object either the output of \code{\link{simulateCohort}} or the
 #' \code{matrix} with the \code{probabilities} slot of that output.
 #' @param times a time vector.
@@ -831,7 +844,7 @@ posteriorProbabilities = function(object, times, M=100, stateNames = paste("Stat
 #' @keywords utilities
 #' @importFrom plyr ddply . 
 #' @importFrom data.table data.table
-#' @export cumulativeIncidence
+#' @export cumulativeIncidence 
 cumulativeIncidence = function(object, times, M=100, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
   if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
   else cohorts <- t(object)

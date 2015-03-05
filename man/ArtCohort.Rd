@@ -3,7 +3,9 @@
 \docType{class}
 \name{ArtCohort}
 \alias{ArtCohort}
+\alias{ArtCohort-class}
 \alias{[,ArtCohort,ANY,ANY,ANY-method}
+\alias{[,ArtCohort-method}
 \alias{[.ArtCohort}
 \alias{head,ArtCohort-method}
 \alias{head.ArtCohort}

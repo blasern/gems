@@ -3,7 +3,9 @@
 \docType{class}
 \name{PosteriorProbabilities}
 \alias{PosteriorProbabilities}
+\alias{PosteriorProbabilities-class}
 \alias{[,PosteriorProbabilities,ANY,ANY,ANY-method}
+\alias{[,PosteriorProbabilities-method}
 \alias{[.PosteriorProbabilities}
 \alias{head,PosteriorProbabilities-method}
 \alias{head.PosteriorProbabilities}

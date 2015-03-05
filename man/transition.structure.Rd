@@ -11,6 +11,7 @@
 \alias{print,transition.structure-method}
 \alias{print.transition.structure}
 \alias{transition.structure}
+\alias{transition.structure-class}
 \title{Class \code{"transition.structure"}}
 \usage{
 \S4method{[[}{transition.structure}(x, i, j, ..., exact = TRUE)
