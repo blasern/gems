@@ -16,13 +16,11 @@
 % ----------------------------------------------------------------------
 % Last modified: 09.03.2015
 % ----------------------------------------------------------------------
-
+  
+%\VignetteIndexEntry{gems}
 \documentclass[a4paper]{article}
-
 \usepackage{pdfpages}
 
 \begin{document}
-
-\includepdf[pages={-}]{gems_jss.pdf}
-
+  \includepdf[pages={-}]{gems_jss.pdf}
 \end{document}

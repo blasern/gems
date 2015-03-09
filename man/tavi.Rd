@@ -30,5 +30,11 @@ the package vignette.
 \examples{
 head(data(tavi))
 }
+\references{
+Nello Blaser, Luisa Salazar Vizcaya, Janne Estill, Cindy Zahnd,
+Bindu Kalesan, Matthias Egger, Olivia Keiser, Thomas Gsponer (2015). gems:
+An R Package for Simulating from Disease Progression Models. Journal of
+Statistical Software, 64(10), 1-22. URL http://www.jstatsoft.org/v64/i10/.
+}
 \keyword{datasets}
 

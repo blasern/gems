@@ -471,6 +471,11 @@ fold <-
 #' where \eqn{N} is the number of states and with value "impossible" for all
 #' potential transitions.
 #' @author Luisa Salazar Vizcaya, Nello Blaser, Thomas Gsponer
+#' @references 
+#' Nello Blaser, Luisa Salazar Vizcaya, Janne Estill, Cindy Zahnd, 
+#' Bindu Kalesan, Matthias Egger, Olivia Keiser, Thomas Gsponer (2015). gems: 
+#' An R Package for Simulating from Disease Progression Models. Journal of 
+#' Statistical Software, 64(10), 1-22. URL http://www.jstatsoft.org/v64/i10/.
 #' @seealso \code{\link{transition.structure}},
 #' \code{\link{simulateCohort}}
 #' @keywords utilities
@@ -522,6 +527,11 @@ generateHazardMatrix <-
 #' \code{\link{generateParameterMatrix}}, \code{\link{simulateCohort}}
 #' @keywords utilities
 #' @export generateParameterCovarianceMatrix
+#' @references 
+#' Nello Blaser, Luisa Salazar Vizcaya, Janne Estill, Cindy Zahnd, 
+#' Bindu Kalesan, Matthias Egger, Olivia Keiser, Thomas Gsponer (2015). gems: 
+#' An R Package for Simulating from Disease Progression Models. Journal of 
+#' Statistical Software, 64(10), 1-22. URL http://www.jstatsoft.org/v64/i10/.
 generateParameterCovarianceMatrix <-
   function (mu)
   {
@@ -560,6 +570,11 @@ generateParameterCovarianceMatrix <-
 #' \code{\link{simulateCohort}}
 #' @keywords utilities
 #' @export generateParameterMatrix
+#' @references 
+#' Nello Blaser, Luisa Salazar Vizcaya, Janne Estill, Cindy Zahnd, 
+#' Bindu Kalesan, Matthias Egger, Olivia Keiser, Thomas Gsponer (2015). gems: 
+#' An R Package for Simulating from Disease Progression Models. Journal of 
+#' Statistical Software, 64(10), 1-22. URL http://www.jstatsoft.org/v64/i10/.
 generateParameterMatrix <-
   function (hf)
   {
@@ -845,6 +860,11 @@ posteriorProbabilities = function(object, times, M=100, stateNames = paste("Stat
 #' @importFrom plyr ddply . 
 #' @importFrom data.table data.table
 #' @export cumulativeIncidence 
+#' @references 
+#' Nello Blaser, Luisa Salazar Vizcaya, Janne Estill, Cindy Zahnd, 
+#' Bindu Kalesan, Matthias Egger, Olivia Keiser, Thomas Gsponer (2015). gems: 
+#' An R Package for Simulating from Disease Progression Models. Journal of 
+#' Statistical Software, 64(10), 1-22. URL http://www.jstatsoft.org/v64/i10/.
 cumulativeIncidence = function(object, times, M=100, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
   if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
   else cohorts <- t(object)
@@ -940,6 +960,11 @@ cumulativeIncidence = function(object, times, M=100, stateNames = paste("State",
 #' @importFrom plyr . ddply
 #' @importFrom data.table data.table
 #' @export transitionProbabilities
+#' @references 
+#' Nello Blaser, Luisa Salazar Vizcaya, Janne Estill, Cindy Zahnd, 
+#' Bindu Kalesan, Matthias Egger, Olivia Keiser, Thomas Gsponer (2015). gems: 
+#' An R Package for Simulating from Disease Progression Models. Journal of 
+#' Statistical Software, 64(10), 1-22. URL http://www.jstatsoft.org/v64/i10/.
 transitionProbabilities <- posteriorProbabilities
 prepareF <-
   function (func, known, historyl, historyp = numeric(2), blp = numeric(2))
@@ -1260,6 +1285,10 @@ simFunctions.NoUnc <- function (so, covariances, history, statesNumber, impossib
 #' plot(inc, ci=FALSE, states=c(2,3))
 #' 
 #' @export simulateCohort
+#' @references Nello Blaser, Luisa Salazar Vizcaya, Janne Estill, Cindy Zahnd, 
+#' Bindu Kalesan, Matthias Egger, Olivia Keiser, Thomas Gsponer (2015). gems: 
+#' An R Package for Simulating from Disease Progression Models. Journal of 
+#' Statistical Software, 64(10), 1-22. URL http://www.jstatsoft.org/v64/i10/.
 simulateCohort <-
   function(transitionFunctions,
            parameters,
