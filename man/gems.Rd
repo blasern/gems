@@ -4,10 +4,10 @@
 \name{gems}
 \alias{gems}
 \alias{gems-package}
-\title{gems: Generalized multistate simulation model}
+\title{gems: Generalized Multistate Simulation Model}
 \description{
-The gems package allows to simulate and analyze multistate models with
-general hazard functions. It provides functionality for the preparation
+Simulate and analyze multistate models with
+general hazard functions. gems provides functionality for the preparation
 of hazard functions and parameters, simulation from a general multistate
 model and predicting future events. The multistate model is not required
 to be a Markov model and may take the history of previous events into
