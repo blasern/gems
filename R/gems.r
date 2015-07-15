@@ -201,7 +201,7 @@ setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste(x
   if (ci){
     plotPrevalence(x@times, x@probabilities, x@states, lower=x@lower, upper=x@upper, main=main, states=states,
                    lwd=lwd, col=col, lty=lty, xlab=xlab, ylab=ylab, ...)
-    if (sum(complete.cases(x@lower))==0) {
+    if (sum(stats::complete.cases(x@lower))==0) {
       warning("Too few simulations for prediction intervals")
     }
     graphics::par(mfrow=c(1,1))
@@ -220,10 +220,10 @@ setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(N
   else parameterCovariance0 = object@parametersCovariances
   aux1 =
     simulateCohort(
-      transitionFunction = object@transitionFunctions,
+      transitionFunctions = object@transitionFunctions,
       parameters = object@parameters,
       cohortSize = newsize - object@size ,
-      parameterCovariance = parameterCovariance0,
+      parameterCovariances = parameterCovariance0,
       timeToTransition= object@timeToTransition,
       baseline = addbaseline,
       initialState=newInitialStates,
@@ -290,7 +290,7 @@ setMethod( "summary", "ArtCohort", function(object){
     (object@transitionFunctions),
     (object@time.to.state)),9,2)
   
-  aux2  <-  getSlots("ArtCohort")
+  aux2  <-  methods::getSlots("ArtCohort")
   summ[,2] <-  noquote(aux2)
   colnames(summ) <- c("Mode", "Class")
   rownames(summ) <- names(aux2)
