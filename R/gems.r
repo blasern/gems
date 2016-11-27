@@ -628,16 +628,19 @@ histNoH <- function(gf, statesNumber, parametric, startingState, absorbing, bl, 
   time = matrix(ncol = statesNumber, nrow =  statesNumber)
   time[unlist(lapply(1:max(possible), function(i) which(possible == i)))] <- time0
   time[possible==0] <- 99*to
-  #
+  # create spell-history of patient (glue together times of realized transitions)
   minTimeState <- apply(time, 1, function(x) c(min(x), which.min(x)))
-  minTimeState[2, minTimeState[2, ] < 1:ncol(minTimeState)] <- NA # bugfix
-  kk = startingState
+  minTimeState[2, minTimeState[2, ] < 1:ncol(minTimeState)] <- NA # bugfix 
+  #gives 2xstates matrix with first line containing lengths of spells and second line the spell to where transition goes.
   path = rep(NA,statesNumber)
-  path[startingState]<-0
-  aux =  startingState
-  while(aux %in% setdiff(startingState:statesNumber, absorbing) && sum(path, na.rm=TRUE)<=to){
+  path[startingState]<-0 # start from time 0.
+  aux = startingState
+  kk = aux
+  while(aux %in% setdiff(startingState:statesNumber, absorbing) # 
+  ){ #setdiff gives vector of non-absorbing states
     aux = minTimeState[2,aux]
-    path[aux] = minTimeState[1,kk] + sum(path, na.rm=TRUE)
+    path[aux] = minTimeState[1,kk]  + path[kk] # bugfix (instead of sum(path, na.rm=TRUE))
+    if (!is.na(path[aux])&path[aux]>to) {path[aux] = NA} # bugfix instead of sum(path, na.rm=TRUE)
     kk =  aux
   }
   return(list(path,NULL))
