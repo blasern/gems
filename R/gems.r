@@ -220,10 +220,10 @@ setMethod( "update", "ArtCohort", function(object, newsize, addbaseline=matrix(N
   else parameterCovariance0 = object@parametersCovariances
   aux1 =
     simulateCohort(
-      transitionFunction = object@transitionFunctions,
+      transitionFunctions = object@transitionFunctions,
       parameters = object@parameters,
       cohortSize = newsize - object@size ,
-      parameterCovariance = parameterCovariance0,
+      parameterCovariances = parameterCovariance0,
       timeToTransition= object@timeToTransition,
       baseline = addbaseline,
       initialState=newInitialStates,
