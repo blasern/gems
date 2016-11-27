@@ -201,7 +201,7 @@ setMethod("plot", "PosteriorProbabilities", function(x, ci=FALSE, main = paste(x
   if (ci){
     plotPrevalence(x@times, x@probabilities, x@states, lower=x@lower, upper=x@upper, main=main, states=states,
                    lwd=lwd, col=col, lty=lty, xlab=xlab, ylab=ylab, ...)
-    if (sum(complete.cases(x@lower))==0) {
+    if (sum(stats::complete.cases(x@lower))==0) {
       warning("Too few simulations for prediction intervals")
     }
     graphics::par(mfrow=c(1,1))
@@ -277,6 +277,7 @@ setMethod("print", "transition.structure", function(x){
   print(mchar)
 })
 
+#' @importFrom methods getSlots
 #' @rdname ArtCohort
 setMethod( "summary", "ArtCohort", function(object){
   summ <- matrix(list(
@@ -290,7 +291,7 @@ setMethod( "summary", "ArtCohort", function(object){
     (object@transitionFunctions),
     (object@time.to.state)),9,2)
   
-  aux2  <-  getSlots("ArtCohort")
+  aux2  <-  methods::getSlots("ArtCohort")
   summ[,2] <-  noquote(aux2)
   colnames(summ) <- c("Mode", "Class")
   rownames(summ) <- names(aux2)
@@ -1288,6 +1289,7 @@ simFunctions.NoUnc <- function (so, covariances, history, statesNumber, impossib
 #' plot(inc, ci=FALSE, states=c(2,3))
 #' 
 #' @export simulateCohort
+#' @importFrom stats complete.cases
 #' @references Nello Blaser, Luisa Salazar Vizcaya, Janne Estill, Cindy Zahnd, 
 #' Bindu Kalesan, Matthias Egger, Olivia Keiser, Thomas Gsponer (2015). gems: 
 #' An R Package for Simulating from Disease Progression Models. Journal of 
@@ -1407,7 +1409,7 @@ simulateCohort <-
         }
       }
       
-      transPos=transPos[complete.cases(transPos),] # only keep positions of defined possible transitions (remove NAs)
+      transPos=transPos[stats::complete.cases(transPos),] # only keep positions of defined possible transitions (remove NAs)
       #
       start <- 0
       for (matIndex in 1:dim(transPos)[1]) { 
