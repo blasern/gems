@@ -346,7 +346,6 @@ createCohorts <-
             startingStates = rep(1, cohortSize), absorbing=cohortSize, impossible = NULL, fixpar = NULL,
             direct = NULL, bl0 = matrix(0, nrow = cohortSize), to = 100, report.every, sampler.steps)
   {
-    
     hazardf <- t(hazardf)[t(auxcounter(statesNumber)) > 0]
     
     if (length(hazardf) < (statesNumber * (statesNumber - 1)/2)) {
@@ -368,7 +367,7 @@ createCohorts <-
       mu <- lapply(mu, as.numeric)
     }
     
-    if(class(sigma) == "transition.structure"){
+    if(is(sigma, "transition.structure")){
       if (dim(sigma)[1] != length(unlist(mu)))
         stop("size of parameters and parameterCovariances are inconsistent")
     }
@@ -587,14 +586,14 @@ generateParameterMatrix <-
                             to = paste("State", 1:dim(hfMat)[1]))
     lengthMu <- numeric(length(hf))
     for (trans in 1:length(hf)) {
-      if (class(hf[[trans]]) == "character") {
+      if (is(hf[[trans]], "character")) {
         lengthMu[trans] <- switch(hf[[trans]],
                                   Weibull=2,
                                   multWeibull=3,
                                   Exponential=1,
                                   impossible=0)
       }
-      else if (class(hf[[trans]]) == "function") {
+      else if (is(hf[[trans]], "function")) {
         if (length(formals(hf[[trans]])) > 0) {
           n1 <- attributes(formals(hf[[trans]]))$names
           n2 <- n1[!(n1 %in% c("t", "bl", "history", "process"))]
@@ -700,7 +699,7 @@ mainFunctions <-
     objects = setFunctions(statesNumber = statesNumber, Mu = Mu,
                            history = history, functions, impossible = impossible)
     
-    if (class(sigma) == "logical") return(simFunctions.NoUnc(objects, covariances = sigma, history = history,
+    if (is(sigma, "logical")) return(simFunctions.NoUnc(objects, covariances = sigma, history = history,
                                                              statesNumber = statesNumber, impossible = impossible,
                                                              cohortSize = cohortSize))
     
@@ -765,7 +764,7 @@ plotPrevalence <-
   }
 
 posteriorProbabilities = function(object, times, M=100, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
-  if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
+  if (is(object, "ArtCohort")) cohorts <- t(object@time.to.state)
   else cohorts <- t(object)
   statesNumber <- dim(cohorts)[1]
   
@@ -870,7 +869,7 @@ posteriorProbabilities = function(object, times, M=100, stateNames = paste("Stat
 #' An R Package for Simulating from Disease Progression Models. Journal of 
 #' Statistical Software, 64(10), 1-22. URL http://www.jstatsoft.org/v64/i10/.
 cumulativeIncidence = function(object, times, M=100, stateNames = paste("State", as.list(1:dim(cohorts)[1]))) {
-  if (class(object)=="ArtCohort") cohorts <- t(object@time.to.state)
+  if (is(object, "ArtCohort")) cohorts <- t(object@time.to.state)
   else cohorts <- t(object)
   statesNumber <- dim(cohorts)[1]
   
@@ -1045,9 +1044,6 @@ sampler <-
     rate[is.na(rate)] <- 0
     rate[rate < .Machine$double.eps] <- .Machine$double.eps
     samples = msm::rpexp(n, rate, time)
-    if (is.nan(samples)) {
-      print(rate)
-    }
     samples[is.nan(samples)] = 99*to
     return(samples)
   }
@@ -1317,7 +1313,7 @@ simulateCohort <-
     
     statesNumber <- dim(transitionFunctions@list.matrix)[1]
     
-    if (class(parameterCovariances) == "transition.structure"){
+    if (is(parameterCovariances, "transition.structure")){
       stopifnot(cohortSize>0,
                 is.list(transitionFunctions@list.matrix),
                 is.list(parameters@list.matrix),
@@ -1345,7 +1341,7 @@ simulateCohort <-
     
     
     transitionFunction  =  transitionFunctions@list.matrix
-    if (class(parameterCovariances) != "transition.structure"){
+    if (!is(parameterCovariances, "transition.structure")){
       if (parameterCovariances == FALSE) parameterCovariance = parameterCovariances
       else message("parameterCovariances needs to be of class transition.structure or the logical FALSE")
     } else {parameterCovariance =  parameterCovariances@list.matrix}
@@ -1391,7 +1387,7 @@ simulateCohort <-
         rm(fct, forms)
       }
     }
-    if (class(parameterCovariances) == "logical") { 
+    if (is(parameterCovariances, "logical")) { 
       sigma <- parameterCovariance
     }
     else  {
@@ -1453,7 +1449,7 @@ simulateCohort <-
     simulatedcohort@size <- dim(cohort)[2]
     simulatedcohort@time.to.state <- as.data.frame(t(cohort))
     
-    if (class(parameterCovariances) == "transition.structure")
+    if (is(parameterCovariances, "transition.structure"))
       simulatedcohort@parametersCovariances <- parameterCovariances
     return(simulatedcohort)
   }
